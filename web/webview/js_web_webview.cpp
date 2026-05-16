@@ -72,7 +72,7 @@ thread_local napi_ref g_jsMsgExtClassRef;
 thread_local int32_t g_asyncCallbackInfoId = 0;
 constexpr int32_t MAX_COUNT_ID = 1024;
 const std::string ANDROID_ASSET = "file:///android_asset/";
-const std::string ARKUIX_PATH_MARKER = "files/arkui-x/";
+const std::string SYS_PATH_MARKER = "files/sys/";
 const std::string HTTP = "http://";
 const std::string HTTPS = "https://";
 const std::string RESOURCE = "resource://rawfile/";
@@ -112,7 +112,7 @@ bool GetRawFileUrl(const std::string &fileName, std::string &result)
     result = NapiWebviewController::appHapPath_ + "/resources/rawfile/" + fileName;
 
 #ifdef ANDROID_PLATFORM
-    size_t pos = NapiWebviewController::appHapPath_.find(ARKUIX_PATH_MARKER);
+    size_t pos = NapiWebviewController::appHapPath_.find(SYS_PATH_MARKER);
     if (pos != std::string::npos) {
         std::string assetPath = ANDROID_ASSET +
             NapiWebviewController::appHapPath_.substr(pos + std::strlen("files/")) + "/resources/rawfile/" + fileName;
