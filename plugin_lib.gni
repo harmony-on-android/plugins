@@ -95,6 +95,7 @@ common_plugin_libs = [
   "util/treeset",
   "util/json",
   "util/stream",
+  "hms/hds",
   "hilog",
   "taskpool",
   "test_plugin",
