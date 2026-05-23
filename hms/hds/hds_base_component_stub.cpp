@@ -1,10 +1,21 @@
 /*
  * HMS HDS Base Component stub for ArkUI-X
  *
- * Registers a NAPI module "hds.hdsBaseComponent" so that
- *   import { HdsNavigation } from '@hms:hds.hdsBaseComponent'
- * can resolve (the runtime strips "@hms:" and calls
- * requireNapi("hds.hdsBaseComponent")).
+ * Registers a NAPI module "hds.hdsBaseComponent" so that HAPs importing
+ * from '@hms:hds.hdsBaseComponent' can resolve successfully.
+ *
+ * Based on the official HMS SDK declaration file
+ * (@hms.hds.hdsBaseComponent.d.ets, @kit.UIDesignKit, since 5.1.0(18)).
+ *
+ * Strategy:
+ *   - HdsNavigation  → delegated to standard ArkUI Navigation  (global JSBind)
+ *   - HdsNavDestination → delegated to standard ArkUI NavDestination (global JSBind)
+ *   - Instance / Attribute helpers → stubbed (return undefined)
+ *   - Enums (ScrollEffectType, HdsNavigationTitleMode) → exported as-is
+ *
+ * The ArkUI framework is tolerant of stub Attribute/Instance helpers for
+ * basic rendering; HDS-specific visual styling (title bar theming, scroll
+ * effects) is silently degraded.
  */
 
 #include "inner_api/plugin_utils_napi.h"
@@ -51,26 +62,36 @@ napi_value ExportHdsBaseComponent(napi_env env, napi_value exports)
 
     // --- Delegate HdsNavigation / HdsNavDestination to standard built-ins ---
     // Navigation and NavDestination are registered as global JS classes
-    // (JSNavigation::JSBind / JSNavDestination::JSBind).  Re-export them
-    // under the HMS names so that import { HdsNavigation } from
-    // '@hms:hds.hdsBaseComponent' actually gets the real components.
+    // (JSNavigation::JSBind / JSNavDestination::JSBind).
+    // Also pre-delegate HdsTabs→Tabs, HdsListItemCard→ListItem — these are
+    // in the compiler whitelist (ohApi.ts) and may ship in future SDK versions.
     napi_value global;
     if (napi_get_global(env, &global) == napi_ok) {
-        napi_value nav;
-        if (napi_get_named_property(env, global, "Navigation", &nav) == napi_ok) {
-            napi_set_named_property(env, exports, "HdsNavigation", nav);
+        napi_value comp;
+        if (napi_get_named_property(env, global, "Navigation", &comp) == napi_ok) {
+            napi_set_named_property(env, exports, "HdsNavigation", comp);
         }
-        if (napi_get_named_property(env, global, "NavDestination", &nav) == napi_ok) {
-            napi_set_named_property(env, exports, "HdsNavDestination", nav);
+        if (napi_get_named_property(env, global, "NavDestination", &comp) == napi_ok) {
+            napi_set_named_property(env, exports, "HdsNavDestination", comp);
+        }
+        if (napi_get_named_property(env, global, "Tabs", &comp) == napi_ok) {
+            napi_set_named_property(env, exports, "HdsTabs", comp);
+        }
+        if (napi_get_named_property(env, global, "ListItem", &comp) == napi_ok) {
+            napi_set_named_property(env, exports, "HdsListItemCard", comp);
         }
     }
 
-    // --- Remaining stubs (instance / attribute helpers) ---
+    // --- Instance / attribute helpers (stubs) ---
     static constexpr const char* kStubNames[] = {
         "HdsNavigationInstance",
         "HdsNavDestinationInstance",
         "HdsNavigationAttribute",
         "HdsNavDestinationAttribute",
+        "HdsTabsInstance",
+        "HdsTabsAttribute",
+        "HdsListItemCardInstance",
+        "HdsListItemCardAttribute",
     };
 
     for (const auto* name : kStubNames) {
