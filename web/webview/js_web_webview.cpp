@@ -343,6 +343,17 @@ napi_value NapiWebviewController::LoadUrl(napi_env env, napi_callback_info info)
         LOGE("ParseUrl failed");
         return nullptr;
     }
+    // Fix: resource://rawfile/ is a HarmonyOS-specific scheme to access
+    // resources bundled in the HAP package.  Android WebView does not
+    // understand this scheme and would return ERR_UNKNOWN_URL_SCHEME.
+    // Convert it to the corresponding file:// path (or asset:// path for
+    // system HAPs stored under files/sys/) so that the WebView can load
+    // the content.  PostUrl() already performs the same conversion.
+    if (webSrc.substr(0, RESOURCE.size()) == RESOURCE) {
+        std::string rawPath = webSrc;
+        rawPath.erase(0, RESOURCE.size());
+        GetRawFileUrl(rawPath, webSrc);
+    }
     if (!ExistsWebFileUrl(webSrc)) {
         BusinessError::ThrowErrorByErrcode(env, INVALID_RESOURCE);
     }
