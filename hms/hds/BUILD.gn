@@ -11,9 +11,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/ets_frontend/es2abc_config.gni")
 import("//build/ohos.gni")
 import("//foundation/arkui/ace_engine/ace_config.gni")
+import("//foundation/arkui/ace_engine/build/ace_gen_obj.gni")
 
+# Phase 1: compile JS mock source to ABC (host toolchain)
+_hds_mock_js = "$ace_root/../../../plugins/hms/hds/src/hds_component_mock.js"
+
+es2abc_gen_abc("gen_hds_abc") {
+  src_js = rebase_path("$_hds_mock_js")
+  dst_file = rebase_path(target_out_dir + "/hds_mock.abc")
+  in_puts = [ "$_hds_mock_js" ]
+  out_puts = [ target_out_dir + "/hds_mock.abc" ]
+  extra_args = [ "--module" ]
+}
+
+# Phase 2: embed ABC into native object (target toolchain)
+if (target_os == "ios") {
+  gen_obj("hds_abc") {
+    input =
+        get_label_info(":gen_hds_abc", "target_out_dir") + "/hds_mock.abc"
+    output = target_out_dir + "/hds_abc.c"
+    snapshot_dep = [ ":gen_hds_abc" ]
+  }
+} else if (target_os == "android") {
+  gen_js_obj("hds_abc") {
+    input =
+        get_label_info(":gen_hds_abc", "target_out_dir") + "/hds_mock.abc"
+    output = target_out_dir + "/hds_abc.o"
+    dep = ":gen_hds_abc"
+  }
+}
+
+# Phase 3: link C++ stub + embedded ABC into shared library
 template("plugin_hms_hds_static") {
   forward_variables_from(invoker, "*")
 
@@ -27,6 +58,12 @@ template("plugin_hms_hds_static") {
       "//plugins/interfaces/native:ace_plugin_util_${platform}",
       "//plugins/libs/napi:napi_${target_os}",
     ]
+
+    if (target_os == "ios") {
+      deps += [ ":gen_obj_src_hds_abc" ]
+    } else if (target_os == "android") {
+      deps += [ ":hds_abc" ]
+    }
 
     subsystem_name = "plugins"
     part_name = "hms"
