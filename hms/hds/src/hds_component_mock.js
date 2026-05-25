@@ -26,10 +26,14 @@ export class ActionBarButton {
         this.iconSize = options?.iconSize;
         this.width = options?.width;
         this.backgroundColor = options?.backgroundColor;
+        this.shadowStyle = options?.shadowStyle;
         this.onClick = options?.onClick;
         this.accessibilityText = options?.accessibilityText;
+        this.accessibilityDescription = options?.accessibilityDescription;
+        this.accessibilityLevel = options?.accessibilityLevel;
         this.id = options?.id;
         this.hoverTips = options?.hoverTips;
+        this.buttonModifier = options?.buttonModifier;
     }
 }
 
@@ -40,11 +44,14 @@ export class ActionBarStyle {
     constructor(options) {
         this.height = options?.height;
         this.backgroundColor = options?.backgroundColor;
+        this.backgroundBlurStyle = options?.backgroundBlurStyle;
         this.innerSpace = options?.innerSpace;
         this.startSpace = options?.startSpace;
         this.endSpace = options?.endSpace;
         this.enabled = options?.enabled !== undefined ? options.enabled : true;
         this.isHorizontal = options?.isHorizontal !== undefined ? options.isHorizontal : true;
+        this.isPrimaryIconChanged = options?.isPrimaryIconChanged !== undefined ? options.isPrimaryIconChanged : false;
+        this.margin = options?.margin;
     }
 }
 
@@ -62,15 +69,30 @@ export class HdsActionBar extends ViewPU {
         this.__startButtons = params?.startButtons;
         this.__endButtons = params?.endButtons;
         this.__actionBarStyle = params?.actionBarStyle;
+        this.__isExpand = params?.isExpand !== undefined ? params.isExpand : false;
+        this.__blurStrategy = params?.blurStrategy;
 
         this.setInitiallyProvidedValue(params);
+        this.finalizeConstruction();
     }
 
     setInitiallyProvidedValue(params) {
     }
 
+    _isHorizontal() {
+        return this.__actionBarStyle?.isHorizontal !== false;
+    }
+
+    _barEnabled() {
+        return this.__actionBarStyle?.enabled !== false;
+    }
+
     _barHeight() {
         return this.__actionBarStyle?.height ?? 56;
+    }
+
+    _innerSpace() {
+        return this.__actionBarStyle?.innerSpace ?? 0;
     }
 
     _startPad() {
@@ -86,26 +108,43 @@ export class HdsActionBar extends ViewPU {
     }
 
     _renderButton(btn) {
+        const btnSize = btn?.width ?? 40;
+        const iconSize = this._btnIconSize(btn);
+        const icon = btn?.baseIcon;
+        const isSymbol = icon && typeof icon === 'object' && icon.type === 40000;
+
+        // Use Row + Image pattern (ref: OHOS Photos ActionBarButton.ets),
+        // avoids Button API compatibility issues on ArkUI-X.
         this.observeComponentCreation2((elmtId, isInitialRender) => {
-            Button.createWithChild();
-            Button.enabled(btn?.enabled ?? true);
-            if (btn?.width) { Button.width(btn.width); }
-            if (btn?.backgroundColor) { Button.backgroundColor(btn.backgroundColor); }
-            Button.onClick(() => {
+            Row.create();
+            Row.width(btnSize);
+            Row.height(btnSize);
+            Row.borderRadius(btnSize / 2);
+            Row.justifyContent(FlexAlign.Center);
+            Row.alignItems(VerticalAlign.Center);
+            if (btn?.backgroundColor) { Row.backgroundColor(btn.backgroundColor); }
+            if (btn?.shadowStyle != null) { Row.shadow(btn.shadowStyle); }
+            Row.onClick(() => {
                 if (btn?.onClick) { btn.onClick(); }
             });
-        }, Button);
+        }, Row);
 
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
-            if (btn?.baseIcon) {
+            if (icon) {
                 this.ifElseBranchUpdateFunction(0, () => {
                     this.observeComponentCreation2((elmtId, isInitialRender) => {
-                        Image.create(btn.baseIcon);
-                        Image.width(this._btnIconSize(btn));
-                        Image.height(this._btnIconSize(btn));
-                        if (btn?.iconFillColor) { Image.fillColor(btn.iconFillColor); }
-                    }, Image);
+                        if (isSymbol) {
+                            SymbolGlyph.create(icon);
+                            SymbolGlyph.fontSize(iconSize);
+                            if (btn?.iconFillColor) { SymbolGlyph.fontColor([btn.iconFillColor]); }
+                        } else {
+                            Image.create(icon);
+                            Image.width(iconSize);
+                            Image.height(iconSize);
+                            if (btn?.iconFillColor) { Image.fillColor(btn.iconFillColor); }
+                        }
+                    }, isSymbol ? SymbolGlyph : Image);
                 });
             } else {
                 this.ifElseBranchUpdateFunction(1, () => { });
@@ -113,21 +152,41 @@ export class HdsActionBar extends ViewPU {
         }, If);
         If.pop();
 
-        Button.pop();
+        Row.pop();
     }
 
     initialRender() {
-        this.observeComponentCreation2((elmtId, isInitialRender) => {
-            Row.create();
-            Row.width("100%");
-            Row.height(this._barHeight());
-            Row.alignItems(VerticalAlign.Center);
-            Row.padding({ left: this._startPad(), right: this._endPad() });
-            if (this.__actionBarStyle?.backgroundColor) {
-                Row.backgroundColor(this.__actionBarStyle.backgroundColor);
-            }
-        }, Row);
+        const isHorizontal = this._isHorizontal();
+        const innerSpace = this._innerSpace();
+        const bgColor = this.__actionBarStyle?.backgroundColor;
+        const bgBlur = this.__actionBarStyle?.backgroundBlurStyle;
+        const margin = this.__actionBarStyle?.margin;
 
+        // Container — Row (horizontal) or Column (vertical)
+        this.observeComponentCreation2((elmtId, isInitialRender) => {
+            if (isHorizontal) {
+                Row.create();
+                Row.width("100%");
+                Row.height(this._barHeight());
+                Row.alignItems(VerticalAlign.Center);
+                Row.padding({ left: this._startPad(), right: this._endPad() });
+                if (innerSpace) { Row.space(innerSpace); }
+                if (bgColor) { Row.backgroundColor(bgColor); }
+                if (bgBlur != null) { Row.backgroundBlurStyle(bgBlur); }
+                if (margin) { Row.margin(margin); }
+            } else {
+                Column.create();
+                Column.width("100%");
+                Column.alignItems(HorizontalAlign.Center);
+                Column.padding({ top: this._startPad(), bottom: this._endPad() });
+                if (innerSpace) { Column.space(innerSpace); }
+                if (bgColor) { Column.backgroundColor(bgColor); }
+                if (bgBlur != null) { Column.backgroundBlurStyle(bgBlur); }
+                if (margin) { Column.margin(margin); }
+            }
+        }, isHorizontal ? Row : Column);
+
+        // Start buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
             if (this.__startButtons && this.__startButtons.length > 0) {
@@ -142,11 +201,15 @@ export class HdsActionBar extends ViewPU {
         }, If);
         If.pop();
 
-        this.observeComponentCreation2((elmtId, isInitialRender) => {
-            Blank.create();
-        }, Blank);
-        Blank.pop();
+        // Spacer before primary button (horizontal only)
+        if (isHorizontal) {
+            this.observeComponentCreation2((elmtId, isInitialRender) => {
+                Blank.create();
+            }, Blank);
+            Blank.pop();
+        }
 
+        // Primary button
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
             if (this.__primaryButton) {
@@ -159,11 +222,15 @@ export class HdsActionBar extends ViewPU {
         }, If);
         If.pop();
 
-        this.observeComponentCreation2((elmtId, isInitialRender) => {
-            Blank.create();
-        }, Blank);
-        Blank.pop();
+        // Spacer before end buttons (horizontal only)
+        if (isHorizontal) {
+            this.observeComponentCreation2((elmtId, isInitialRender) => {
+                Blank.create();
+            }, Blank);
+            Blank.pop();
+        }
 
+        // End buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
             if (this.__endButtons && this.__endButtons.length > 0) {
@@ -178,12 +245,20 @@ export class HdsActionBar extends ViewPU {
         }, If);
         If.pop();
 
-        Row.pop();
+        if (isHorizontal) {
+            Row.pop();
+        } else {
+            Column.pop();
+        }
     }
 
     aboutToAppear() { }
     aboutToDisappear() { }
-    aboutToBeDeleted() { }
+    aboutToBeDeleted() {
+        SubscriberManager.Get().delete(this.id__());
+        this.aboutToBeDeletedInternal();
+    }
+    rerender() { this.updateDirtyElements(); }
     updateStateVarsOfChildByElmtId(elmtId, params) { }
     purgeVariableDependenciesOnElmtId(elmtId) { }
 }
