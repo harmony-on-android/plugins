@@ -1,23 +1,40 @@
 /*
  * HDS Component mock for ArkUI-X
  *
- * Provides ViewPU-based mock implementations of HDS components plus
+ * Provides ViewV2-based mock implementations of HDS components plus
  * enums, stubs, and delegations — all exported as ES module exports.
  *
  * The compiled ABC is embedded into libhms_hds.so and loaded via
  * napi_module_with_js (ABC-only, no NAPI register_func — matches popup pattern).
  *
- * Pattern reference: advanced_ui_component/popup/interfaces/popup.js
+ * Pattern reference: advanced_ui_component/arcbutton/interfaces/arcbutton.js
+ * V2 decorators: @ObservedV2, @Trace, @Param, @Local
  */
+
+var __decorate = (this && this.__decorate) || function (t1, target, key, desc) {
+    var c = arguments.length;
+    var r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc;
+    var d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") {
+        r = Reflect.decorate(t1, target, key, desc);
+    } else {
+        for (var u1 = t1.length - 1; u1 >= 0; u1--) {
+            if (d = t1[u1]) {
+                r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+            }
+        }
+    }
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 
 if (!("finalizeConstruction" in ViewPU.prototype)) {
     Reflect.set(ViewPU.prototype, "finalizeConstruction", () => { });
 }
 
 // =========================================================================
-// ActionBarButton: @Observed class for button options
+// ActionBarButton: @ObservedV2 class with @Trace fields
 // =========================================================================
-export class ActionBarButton {
+let ActionBarButton = class ActionBarButton {
     constructor(options) {
         this.baseIcon = options?.baseIcon;
         this.altIcon = options?.altIcon;
@@ -35,12 +52,29 @@ export class ActionBarButton {
         this.hoverTips = options?.hoverTips;
         this.buttonModifier = options?.buttonModifier;
     }
-}
+};
+__decorate([Trace], ActionBarButton.prototype, "baseIcon", void 0);
+__decorate([Trace], ActionBarButton.prototype, "altIcon", void 0);
+__decorate([Trace], ActionBarButton.prototype, "enabled", void 0);
+__decorate([Trace], ActionBarButton.prototype, "iconFillColor", void 0);
+__decorate([Trace], ActionBarButton.prototype, "iconSize", void 0);
+__decorate([Trace], ActionBarButton.prototype, "width", void 0);
+__decorate([Trace], ActionBarButton.prototype, "backgroundColor", void 0);
+__decorate([Trace], ActionBarButton.prototype, "shadowStyle", void 0);
+__decorate([Trace], ActionBarButton.prototype, "onClick", void 0);
+__decorate([Trace], ActionBarButton.prototype, "accessibilityText", void 0);
+__decorate([Trace], ActionBarButton.prototype, "accessibilityDescription", void 0);
+__decorate([Trace], ActionBarButton.prototype, "accessibilityLevel", void 0);
+__decorate([Trace], ActionBarButton.prototype, "id", void 0);
+__decorate([Trace], ActionBarButton.prototype, "hoverTips", void 0);
+__decorate([Trace], ActionBarButton.prototype, "buttonModifier", void 0);
+ActionBarButton = __decorate([ObservedV2], ActionBarButton);
+export { ActionBarButton };
 
 // =========================================================================
-// ActionBarStyle: @Observed class for style options
+// ActionBarStyle: @ObservedV2 class with @Trace fields
 // =========================================================================
-export class ActionBarStyle {
+let ActionBarStyle = class ActionBarStyle {
     constructor(options) {
         this.height = options?.height;
         this.backgroundColor = options?.backgroundColor;
@@ -53,68 +87,89 @@ export class ActionBarStyle {
         this.isPrimaryIconChanged = options?.isPrimaryIconChanged !== undefined ? options.isPrimaryIconChanged : false;
         this.margin = options?.margin;
     }
-}
+};
+__decorate([Trace], ActionBarStyle.prototype, "height", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "backgroundColor", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "backgroundBlurStyle", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "innerSpace", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "startSpace", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "endSpace", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "enabled", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "isHorizontal", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "isPrimaryIconChanged", void 0);
+__decorate([Trace], ActionBarStyle.prototype, "margin", void 0);
+ActionBarStyle = __decorate([ObservedV2], ActionBarStyle);
+export { ActionBarStyle };
 
 // =========================================================================
-// HdsActionBar: @Component struct (ViewPU-based)
+// HdsActionBar: @ComponentV2 struct (ViewV2-based)
 // =========================================================================
-export class HdsActionBar extends ViewPU {
-    constructor(parent, params, __localStorage, elmtId, paramsLambda, extraInfo) {
-        super(parent, __localStorage, elmtId, extraInfo);
-        if (typeof paramsLambda === "function") {
-            this.paramsGenerator_ = paramsLambda;
-        }
+export class HdsActionBar extends ViewV2 {
+    constructor(parent, params, __localStorage, elmtId = -1, paramsLambda, extraInfo) {
+        super(parent, elmtId, extraInfo);
 
-        this.__primaryButton = params?.primaryButton;
-        this.__startButtons = params?.startButtons;
-        this.__endButtons = params?.endButtons;
-        this.__actionBarStyle = params?.actionBarStyle;
-        this.__isExpand = params?.isExpand !== undefined ? params.isExpand : false;
-        this.__blurStrategy = params?.blurStrategy;
+        this.initParam("primaryButton", (params && "primaryButton" in params) ? params.primaryButton : undefined);
+        this.initParam("startButtons", (params && "startButtons" in params) ? params.startButtons : undefined);
+        this.initParam("endButtons", (params && "endButtons" in params) ? params.endButtons : undefined);
+        this.initParam("actionBarStyle", (params && "actionBarStyle" in params) ? params.actionBarStyle : undefined);
+        this.initParam("isExpand", (params && "isExpand" in params) ? params.isExpand : false);
+        this.initParam("blurStrategy", (params && "blurStrategy" in params) ? params.blurStrategy : undefined);
 
-        this.setInitiallyProvidedValue(params);
         this.finalizeConstruction();
     }
 
-    setInitiallyProvidedValue(params) {
+    resetStateVarsOnReuse(params) {
+        this.resetParam("primaryButton", (params && "primaryButton" in params) ? params.primaryButton : undefined);
+        this.resetParam("startButtons", (params && "startButtons" in params) ? params.startButtons : undefined);
+        this.resetParam("endButtons", (params && "endButtons" in params) ? params.endButtons : undefined);
+        this.resetParam("actionBarStyle", (params && "actionBarStyle" in params) ? params.actionBarStyle : undefined);
+        this.resetParam("isExpand", (params && "isExpand" in params) ? params.isExpand : false);
+        this.resetParam("blurStrategy", (params && "blurStrategy" in params) ? params.blurStrategy : undefined);
+        this.resetMonitorsOnReuse();
     }
 
     _isHorizontal() {
-        return this.__actionBarStyle?.isHorizontal !== false;
+        return this.actionBarStyle?.isHorizontal !== false;
     }
 
     _barEnabled() {
-        return this.__actionBarStyle?.enabled !== false;
+        return this.actionBarStyle?.enabled !== false;
     }
 
     _barHeight() {
-        return this.__actionBarStyle?.height ?? 56;
+        return this.actionBarStyle?.height ?? 56;
     }
 
     _innerSpace() {
-        return this.__actionBarStyle?.innerSpace ?? 0;
+        return this.actionBarStyle?.innerSpace ?? 0;
     }
 
     _startPad() {
-        return this.__actionBarStyle?.startSpace ?? 16;
+        return this.actionBarStyle?.startSpace ?? 16;
     }
 
     _endPad() {
-        return this.__actionBarStyle?.endSpace ?? 16;
+        return this.actionBarStyle?.endSpace ?? 16;
     }
 
     _btnIconSize(btn) {
         return btn?.iconSize ?? 24;
     }
 
-    _renderButton(btn) {
+    _resolveIcon(btn, isPrimary) {
+        if (isPrimary && this.actionBarStyle?.isPrimaryIconChanged && btn?.altIcon) {
+            return btn.altIcon;
+        }
+        return btn?.baseIcon;
+    }
+
+    _renderButton(btn, isPrimary) {
         const btnSize = btn?.width ?? 40;
         const iconSize = this._btnIconSize(btn);
-        const icon = btn?.baseIcon;
-        const isSymbol = icon && typeof icon === 'object' && icon.type === 40000;
+        const enabled = btn?.enabled !== false;
+        // Pre-compute component type from baseIcon (doesn't change between renders)
+        const baseIsSymbol = btn?.baseIcon && typeof btn?.baseIcon === 'object' && btn.baseIcon.type === 40000;
 
-        // Use Row + Image pattern (ref: OHOS Photos ActionBarButton.ets),
-        // avoids Button API compatibility issues on ArkUI-X.
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             Row.create();
             Row.width(btnSize);
@@ -122,29 +177,33 @@ export class HdsActionBar extends ViewPU {
             Row.borderRadius(btnSize / 2);
             Row.justifyContent(FlexAlign.Center);
             Row.alignItems(VerticalAlign.Center);
+            if (!enabled) { Row.opacity(0.4); }
             if (btn?.backgroundColor) { Row.backgroundColor(btn.backgroundColor); }
             if (btn?.shadowStyle != null) { Row.shadow(btn.shadowStyle); }
             Row.onClick(() => {
-                if (btn?.onClick) { btn.onClick(); }
+                if (enabled && btn?.onClick) { btn.onClick(); }
             });
         }, Row);
 
         this.observeComponentCreation2((elmtId, isInitialRender) => {
+            // Resolve icon INSIDE callback so ObserveV2 tracks this.actionBarStyle reads
+            const icon = this._resolveIcon(btn, isPrimary);
             If.create();
             if (icon) {
                 this.ifElseBranchUpdateFunction(0, () => {
                     this.observeComponentCreation2((elmtId, isInitialRender) => {
-                        if (isSymbol) {
-                            SymbolGlyph.create(icon);
+                        const resolved = this._resolveIcon(btn, isPrimary);
+                        if (baseIsSymbol) {
+                            SymbolGlyph.create(resolved);
                             SymbolGlyph.fontSize(iconSize);
                             if (btn?.iconFillColor) { SymbolGlyph.fontColor([btn.iconFillColor]); }
                         } else {
-                            Image.create(icon);
+                            Image.create(resolved);
                             Image.width(iconSize);
                             Image.height(iconSize);
                             if (btn?.iconFillColor) { Image.fillColor(btn.iconFillColor); }
                         }
-                    }, isSymbol ? SymbolGlyph : Image);
+                    }, baseIsSymbol ? SymbolGlyph : Image);
                 });
             } else {
                 this.ifElseBranchUpdateFunction(1, () => { });
@@ -158,9 +217,9 @@ export class HdsActionBar extends ViewPU {
     initialRender() {
         const isHorizontal = this._isHorizontal();
         const innerSpace = this._innerSpace();
-        const bgColor = this.__actionBarStyle?.backgroundColor;
-        const bgBlur = this.__actionBarStyle?.backgroundBlurStyle;
-        const margin = this.__actionBarStyle?.margin;
+        const bgColor = this.actionBarStyle?.backgroundColor;
+        const bgBlur = this.actionBarStyle?.backgroundBlurStyle;
+        const margin = this.actionBarStyle?.margin;
 
         // Container — Row (horizontal) or Column (vertical)
         this.observeComponentCreation2((elmtId, isInitialRender) => {
@@ -189,10 +248,10 @@ export class HdsActionBar extends ViewPU {
         // Start buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
-            if (this.__startButtons && this.__startButtons.length > 0) {
+            if (this.startButtons && this.startButtons.length > 0) {
                 this.ifElseBranchUpdateFunction(0, () => {
-                    for (let i = 0; i < this.__startButtons.length; i++) {
-                        this._renderButton(this.__startButtons[i]);
+                    for (let i = 0; i < this.startButtons.length; i++) {
+                        this._renderButton(this.startButtons[i], false);
                     }
                 });
             } else {
@@ -212,9 +271,9 @@ export class HdsActionBar extends ViewPU {
         // Primary button
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
-            if (this.__primaryButton) {
+            if (this.primaryButton) {
                 this.ifElseBranchUpdateFunction(0, () => {
-                    this._renderButton(this.__primaryButton);
+                    this._renderButton(this.primaryButton, true);
                 });
             } else {
                 this.ifElseBranchUpdateFunction(1, () => { });
@@ -233,10 +292,10 @@ export class HdsActionBar extends ViewPU {
         // End buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
-            if (this.__endButtons && this.__endButtons.length > 0) {
+            if (this.endButtons && this.endButtons.length > 0) {
                 this.ifElseBranchUpdateFunction(0, () => {
-                    for (let i = 0; i < this.__endButtons.length; i++) {
-                        this._renderButton(this.__endButtons[i]);
+                    for (let i = 0; i < this.endButtons.length; i++) {
+                        this._renderButton(this.endButtons[i], false);
                     }
                 });
             } else {
@@ -252,16 +311,40 @@ export class HdsActionBar extends ViewPU {
         }
     }
 
-    aboutToAppear() { }
-    aboutToDisappear() { }
-    aboutToBeDeleted() {
-        SubscriberManager.Get().delete(this.id__());
-        this.aboutToBeDeletedInternal();
+    updateStateVars(params) {
+        if (params === undefined) {
+            return;
+        }
+        if ("primaryButton" in params) {
+            this.updateParam("primaryButton", params.primaryButton);
+        }
+        if ("startButtons" in params) {
+            this.updateParam("startButtons", params.startButtons);
+        }
+        if ("endButtons" in params) {
+            this.updateParam("endButtons", params.endButtons);
+        }
+        if ("actionBarStyle" in params) {
+            this.updateParam("actionBarStyle", params.actionBarStyle);
+        }
+        if ("isExpand" in params) {
+            this.updateParam("isExpand", params.isExpand);
+        }
+        if ("blurStrategy" in params) {
+            this.updateParam("blurStrategy", params.blurStrategy);
+        }
     }
-    rerender() { this.updateDirtyElements(); }
-    updateStateVarsOfChildByElmtId(elmtId, params) { }
-    purgeVariableDependenciesOnElmtId(elmtId) { }
+
+    rerender() {
+        this.updateDirtyElements();
+    }
 }
+__decorate([Param], HdsActionBar.prototype, "primaryButton", void 0);
+__decorate([Param], HdsActionBar.prototype, "startButtons", void 0);
+__decorate([Param], HdsActionBar.prototype, "endButtons", void 0);
+__decorate([Param], HdsActionBar.prototype, "actionBarStyle", void 0);
+__decorate([Param], HdsActionBar.prototype, "isExpand", void 0);
+__decorate([Param], HdsActionBar.prototype, "blurStrategy", void 0);
 
 // =========================================================================
 // Component delegations: HDS components → ArkUI built-ins
