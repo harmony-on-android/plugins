@@ -347,6 +347,196 @@ __decorate([Param], HdsActionBar.prototype, "isExpand", void 0);
 __decorate([Param], HdsActionBar.prototype, "blurStrategy", void 0);
 
 // =========================================================================
+// HdsSideBar: @ComponentV2 struct (ViewV2-based)
+// Delegates to ArkUI-X SideBarContainer with @BuilderParam children
+// =========================================================================
+export class HdsSideBar extends ViewV2 {
+    constructor(parent, params, __localStorage, elmtId = -1, paramsLambda, extraInfo) {
+        super(parent, elmtId, extraInfo);
+
+        // @BuilderParam — stored directly, not via initParam (not @Param)
+        this.sideBarPanelBuilder = params?.sideBarPanelBuilder;
+        this.contentPanelBuilder = params?.contentPanelBuilder;
+
+        // @Event callback — stored directly (not @Param)
+        this.$isShowSideBar = params?.$isShowSideBar;
+
+        // @Param fields
+        this.initParam("contentAreaMask", (params && "contentAreaMask" in params) ? params.contentAreaMask : undefined);
+        this.initParam("isShowSideBar", (params && "isShowSideBar" in params) ? params.isShowSideBar : undefined);
+        this.initParam("minSideBarWidth", (params && "minSideBarWidth" in params) ? params.minSideBarWidth : undefined);
+        this.initParam("maxSideBarWidth", (params && "maxSideBarWidth" in params) ? params.maxSideBarWidth : undefined);
+        this.initParam("minContentWidth", (params && "minContentWidth" in params) ? params.minContentWidth : undefined);
+        this.initParam("sideBarColor", (params && "sideBarColor" in params) ? params.sideBarColor : undefined);
+        this.initParam("contentColor", (params && "contentColor" in params) ? params.contentColor : undefined);
+        this.initParam("sideBarWidth", (params && "sideBarWidth" in params) ? params.sideBarWidth : undefined);
+        this.initParam("autoHide", (params && "autoHide" in params) ? params.autoHide : undefined);
+        this.initParam("isSideBarBlur", (params && "isSideBarBlur" in params) ? params.isSideBarBlur : undefined);
+        this.initParam("sideBarPosition", (params && "sideBarPosition" in params) ? params.sideBarPosition : undefined);
+        this.initParam("onChange", (params && "onChange" in params) ? params.onChange : undefined);
+        this.initParam("sideBarContainerType", (params && "sideBarContainerType" in params) ? params.sideBarContainerType : undefined);
+        this.initParam("swipeEnabled", (params && "swipeEnabled" in params) ? params.swipeEnabled : undefined);
+        this.initParam("scaleContentEnabled", (params && "scaleContentEnabled" in params) ? params.scaleContentEnabled : undefined);
+
+        this.finalizeConstruction();
+    }
+
+    resetStateVarsOnReuse(params) {
+        this.sideBarPanelBuilder = params?.sideBarPanelBuilder;
+        this.contentPanelBuilder = params?.contentPanelBuilder;
+        this.$isShowSideBar = params?.$isShowSideBar;
+
+        this.resetParam("contentAreaMask", (params && "contentAreaMask" in params) ? params.contentAreaMask : undefined);
+        this.resetParam("isShowSideBar", (params && "isShowSideBar" in params) ? params.isShowSideBar : undefined);
+        this.resetParam("minSideBarWidth", (params && "minSideBarWidth" in params) ? params.minSideBarWidth : undefined);
+        this.resetParam("maxSideBarWidth", (params && "maxSideBarWidth" in params) ? params.maxSideBarWidth : undefined);
+        this.resetParam("minContentWidth", (params && "minContentWidth" in params) ? params.minContentWidth : undefined);
+        this.resetParam("sideBarColor", (params && "sideBarColor" in params) ? params.sideBarColor : undefined);
+        this.resetParam("contentColor", (params && "contentColor" in params) ? params.contentColor : undefined);
+        this.resetParam("sideBarWidth", (params && "sideBarWidth" in params) ? params.sideBarWidth : undefined);
+        this.resetParam("autoHide", (params && "autoHide" in params) ? params.autoHide : undefined);
+        this.resetParam("isSideBarBlur", (params && "isSideBarBlur" in params) ? params.isSideBarBlur : undefined);
+        this.resetParam("sideBarPosition", (params && "sideBarPosition" in params) ? params.sideBarPosition : undefined);
+        this.resetParam("onChange", (params && "onChange" in params) ? params.onChange : undefined);
+        this.resetParam("sideBarContainerType", (params && "sideBarContainerType" in params) ? params.sideBarContainerType : undefined);
+        this.resetParam("swipeEnabled", (params && "swipeEnabled" in params) ? params.swipeEnabled : undefined);
+        this.resetParam("scaleContentEnabled", (params && "scaleContentEnabled" in params) ? params.scaleContentEnabled : undefined);
+        this.resetMonitorsOnReuse();
+    }
+
+    _applyAttributes() {
+        if (this.isShowSideBar !== undefined) {
+            SideBarContainer.showSideBar(this.isShowSideBar);
+        }
+        if (this.sideBarWidth !== undefined) {
+            SideBarContainer.sideBarWidth(this.sideBarWidth);
+        }
+        if (this.minSideBarWidth !== undefined) {
+            SideBarContainer.minSideBarWidth(this.minSideBarWidth);
+        }
+        if (this.maxSideBarWidth !== undefined) {
+            SideBarContainer.maxSideBarWidth(this.maxSideBarWidth);
+        }
+        if (this.minContentWidth !== undefined) {
+            SideBarContainer.minContentWidth(this.minContentWidth);
+        }
+        if (this.autoHide !== undefined) {
+            SideBarContainer.autoHide(this.autoHide);
+        }
+        if (this.sideBarPosition !== undefined) {
+            SideBarContainer.sideBarPosition(this.sideBarPosition);
+        }
+        if (this.sideBarColor !== undefined) {
+            SideBarContainer.sideBarBackgroundColor(this.sideBarColor);
+        }
+        if (this.contentColor !== undefined) {
+            SideBarContainer.contentBackgroundColor(this.contentColor);
+        }
+        if (this.isSideBarBlur) {
+            SideBarContainer.sideBarBackgroundBlurStyle(BlurStyle.REGULAR);
+        }
+        if (this.swipeEnabled !== undefined) {
+            SideBarContainer.showSideBarWithGesture(this.swipeEnabled);
+        }
+        SideBarContainer.showControlButton(true);
+        if (this.$isShowSideBar !== undefined || this.onChange !== undefined) {
+            SideBarContainer.onChange((isShow) => {
+                if (this.$isShowSideBar) {
+                    this.$isShowSideBar(isShow);
+                }
+                if (this.onChange) {
+                    this.onChange(isShow);
+                }
+            });
+        }
+    }
+
+    initialRender() {
+        this.observeComponentCreation2((elmtId, isInitialRender) => {
+            SideBarContainer.create(this.sideBarContainerType);
+            this._applyAttributes();
+        }, SideBarContainer);
+
+        if (this.sideBarPanelBuilder) {
+            this.sideBarPanelBuilder.bind(this)();
+        }
+        if (this.contentPanelBuilder) {
+            this.contentPanelBuilder.bind(this)();
+        }
+
+        SideBarContainer.pop();
+    }
+
+    updateStateVars(params) {
+        if (params === undefined) { return; }
+        if ("isShowSideBar" in params) {
+            this.updateParam("isShowSideBar", params.isShowSideBar);
+        }
+        if ("sideBarWidth" in params) {
+            this.updateParam("sideBarWidth", params.sideBarWidth);
+        }
+        if ("minSideBarWidth" in params) {
+            this.updateParam("minSideBarWidth", params.minSideBarWidth);
+        }
+        if ("maxSideBarWidth" in params) {
+            this.updateParam("maxSideBarWidth", params.maxSideBarWidth);
+        }
+        if ("minContentWidth" in params) {
+            this.updateParam("minContentWidth", params.minContentWidth);
+        }
+        if ("autoHide" in params) {
+            this.updateParam("autoHide", params.autoHide);
+        }
+        if ("sideBarPosition" in params) {
+            this.updateParam("sideBarPosition", params.sideBarPosition);
+        }
+        if ("sideBarColor" in params) {
+            this.updateParam("sideBarColor", params.sideBarColor);
+        }
+        if ("contentColor" in params) {
+            this.updateParam("contentColor", params.contentColor);
+        }
+        if ("isSideBarBlur" in params) {
+            this.updateParam("isSideBarBlur", params.isSideBarBlur);
+        }
+        if ("swipeEnabled" in params) {
+            this.updateParam("swipeEnabled", params.swipeEnabled);
+        }
+        if ("contentAreaMask" in params) {
+            this.updateParam("contentAreaMask", params.contentAreaMask);
+        }
+        if ("scaleContentEnabled" in params) {
+            this.updateParam("scaleContentEnabled", params.scaleContentEnabled);
+        }
+        if ("sideBarContainerType" in params) {
+            this.updateParam("sideBarContainerType", params.sideBarContainerType);
+        }
+        if ("onChange" in params) {
+            this.updateParam("onChange", params.onChange);
+        }
+    }
+
+    rerender() {
+        this.updateDirtyElements();
+    }
+}
+__decorate([Param], HdsSideBar.prototype, "contentAreaMask", void 0);
+__decorate([Param], HdsSideBar.prototype, "isShowSideBar", void 0);
+__decorate([Param], HdsSideBar.prototype, "minSideBarWidth", void 0);
+__decorate([Param], HdsSideBar.prototype, "maxSideBarWidth", void 0);
+__decorate([Param], HdsSideBar.prototype, "minContentWidth", void 0);
+__decorate([Param], HdsSideBar.prototype, "sideBarColor", void 0);
+__decorate([Param], HdsSideBar.prototype, "contentColor", void 0);
+__decorate([Param], HdsSideBar.prototype, "sideBarWidth", void 0);
+__decorate([Param], HdsSideBar.prototype, "autoHide", void 0);
+__decorate([Param], HdsSideBar.prototype, "isSideBarBlur", void 0);
+__decorate([Param], HdsSideBar.prototype, "sideBarPosition", void 0);
+__decorate([Param], HdsSideBar.prototype, "onChange", void 0);
+__decorate([Param], HdsSideBar.prototype, "sideBarContainerType", void 0);
+__decorate([Param], HdsSideBar.prototype, "swipeEnabled", void 0);
+__decorate([Param], HdsSideBar.prototype, "scaleContentEnabled", void 0);
+
+// =========================================================================
 // Component delegations: HDS components → ArkUI built-ins
 // =========================================================================
 export const HdsNavigation = Navigation;
@@ -695,6 +885,7 @@ export function HdsListItemCardInstance() { }
 // =========================================================================
 export default {
     HdsActionBar,
+    HdsSideBar,
     ActionBarButton,
     ActionBarStyle,
     HdsNavigation,
