@@ -354,31 +354,341 @@ export const HdsNavDestination = NavDestination;
 export const HdsTabs = Tabs;
 export const HdsListItemCard = ListItem;
 export const HdsListItem = ListItem;
-export const PrefixImage = Image;
-export const SuffixButton = Button;
-export const SuffixArrowIconText = Row;
+
+// =========================================================================
+// PrefixItem / SuffixItem base classes
+// SDK: abstract data-container classes, no fields
+// =========================================================================
+export class PrefixItem {
+}
+export class SuffixItem {
+}
+
+// =========================================================================
+// Prefix subclasses — data containers that HAP constructs with options
+// =========================================================================
+export class PrefixImage extends PrefixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class PrefixIcon extends PrefixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class PrefixBadge extends PrefixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class PrefixSwitch extends PrefixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class PrefixToggleButton extends PrefixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class PrefixButton extends PrefixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class PrefixCustomBuilder extends PrefixItem {
+    constructor(customBuilder) {
+        super();
+        this.customBuilder = customBuilder;
+    }
+}
+
+// =========================================================================
+// Suffix subclasses — data containers that HAP constructs with options
+// =========================================================================
+export class SuffixText extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixImage extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixLoadingProgress extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixRadio extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixCheckbox extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixSwitch extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixArrow extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixBadge extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixButton extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixIcon extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixSubIcon extends SuffixItem {
+    constructor(options, subOptions) {
+        super();
+        this.options = options;
+        this.subOptions = subOptions;
+    }
+}
+export class SuffixSelect extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixToggleButton extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixBadgeAndArrow extends SuffixItem {
+    constructor(badgeOptions, arrowOptions) {
+        super();
+        this.badgeOptions = badgeOptions;
+        this.arrowOptions = arrowOptions;
+    }
+}
+export class SuffixTextAndArrow extends SuffixItem {
+    constructor(textOptions, arrowOptions) {
+        super();
+        this.textOptions = textOptions;
+        this.arrowOptions = arrowOptions;
+    }
+}
+export class SuffixArrowIconText extends SuffixItem {
+    constructor(options) {
+        super();
+        this.options = options;
+    }
+}
+export class SuffixCustomBuilder extends SuffixItem {
+    constructor(customBuilder) {
+        super();
+        this.customBuilder = customBuilder;
+    }
+}
+
+// =========================================================================
+// Attribute / Modifier classes
+// =========================================================================
+export class HdsListItemCardAttribute {
+}
+export class HdsListItemCardModifier extends HdsListItemCardAttribute {
+    applyNormalAttribute(instance) { }
+}
+export class HdsTabsAttribute {
+}
+export class HdsTabsModifier extends HdsTabsAttribute {
+    applyNormalAttribute(instance) { }
+}
+
+// =========================================================================
+// HdsTabsController — extends TabsController (global from ArkUI)
+// =========================================================================
+export class HdsTabsController extends TabsController {
+    bindScroller(value, scroller, parentScroller) { }
+    unbindScroller(scroller) { }
+    applyMiniBarStyle(style) { }
+    applyHideAnimation(mode) { }
+    applyShowAnimation(mode) { }
+}
+
+// =========================================================================
+// HdsSnackBar — UI-level stub (not rendered, no-op)
+// =========================================================================
+export class HdsSnackBar {
+    constructor(uiContext) {
+        this.uiContext = uiContext;
+    }
+    show(icon, message, operation, style) { }
+    dismiss() { }
+}
+export const SnackBarOperationType = {
+    TEXT_ONLY: 0,
+    CLOSE_BUTTON_ONLY: 1,
+    TEXT_WITH_ARROW: 2,
+    TEXT_WITH_CLOSE: 3,
+    HIGHLIGHT_TEXT_WITH_CLOSE: 4,
+};
+export const SnackBarIconType = {
+    SMALL: 0,
+    NORMAL: 1,
+};
+
+// =========================================================================
+// hdsMaterial namespace
+// =========================================================================
+export const hdsMaterial = {
+    MaterialType: {
+        NONE: 0,
+        ADAPTIVE: 100,
+        IMMERSIVE: 101,
+    },
+    MaterialLevel: {
+        EXQUISITE: 0,
+        GENTLE: 1,
+        SMOOTH: 2,
+        ADAPTIVE: 10,
+    },
+    getSystemMaterialTypes() {
+        return [hdsMaterial.MaterialType.NONE];
+    },
+};
 
 // =========================================================================
 // Enums
 // =========================================================================
-export const ScrollEffectType = { COMMON_BLUR: 0 };
-export const HdsNavigationTitleMode = { FREE: 0, FULL: 1, MINI: 2 };
-export const DividerMode = { AUTO: 0, ALWAYS: 1, NONE: 2 };
-export const HdsNavDestinationTitleMode = { FREE: 0, FULL: 1, MINI: 2 };
+// ScrollEffectType (SDK: hdsBaseComponent)
+export const ScrollEffectType = {
+    COMMON_BLUR: 0,
+    GRADUAL_BLUR: 1,
+    GRADIENT_BLUR: 2,
+    IMMERSIVE_GRADIENT_BLUR: 3,
+};
+// HdsNavigationTitleMode (SDK: hdsBaseComponent)
+export const HdsNavigationTitleMode = {
+    FREE: 0,
+    FULL: 1,
+    MINI: 2,
+    MODAL: 3,
+};
+// HdsNavDestinationTitleMode (SDK: hdsBaseComponent)
+export const HdsNavDestinationTitleMode = {
+    MINI: 100,
+    MODAL: 101,
+};
+// DividerMode (SDK: hdsBaseComponent)
+export const DividerMode = {
+    VISIBLE: 0,
+    NONE: 1,
+    FOLLOW_SCROLL: 2,
+};
+// DividerShowType (SDK: hdsBaseComponent)
+export const DividerShowType = {
+    OFF: 0,
+    ON: 1,
+    AUTO: 2,
+};
+// TextStyleMode (SDK: hdsBaseComponent)
+export const TextStyleMode = {
+    NORMAL: 200,
+    SINGLE_CHARACTER: 201,
+};
+// BottomBuilderShowType (SDK: hdsBaseComponent)
+export const BottomBuilderShowType = {
+    DIRECTLY_SHOW: 0,
+    OVERDRAG_SHOW: 1,
+};
+// HideMode (SDK: hdsBaseComponent)
+export const HideMode = {
+    SCROLL_UP_TO: 0,
+    SCROLL_UP: 1,
+    SCROLL_DOWN: 2,
+    SCROLL_UP_TO_BLEND_SCROLL_UP: 3,
+};
+// IconStyleMode (SDK: hdsBaseComponent)
+export const IconStyleMode = {
+    SMALL: 100,
+    NORMAL: 101,
+    LARGE: 102,
+};
+// BlurStrategy (SDK: hdsBaseComponent)
+export const BlurStrategy = {
+    ENABLE: 0,
+    DISABLE: 1,
+    ADAPTIVE: 2,
+};
+// TitleSize (SDK: hdsBaseComponent)
+export const TitleSize = {
+    TITLE_S: 0,
+    TITLE_ML: 1,
+};
+// IconSize (SDK: hdsBaseComponent)
+export const IconSize = {
+    SMALL_ICON: 1,
+    SYSTEM_ICON: 2,
+};
+// HdsBarStyle (SDK: hdsBaseComponent)
+export const HdsBarStyle = {
+    COLLAPSE: 0,
+    EXPAND: 1,
+};
+// HdsTabsBarChangeMode (SDK: hdsBaseComponent)
+export const HdsTabsBarChangeMode = {
+    NORMAL: 0,
+    USER_CLICK: 1,
+    APP_TRIGGER: 2,
+};
+// HdsAnimationMode (SDK: hdsBaseComponent)
+export const HdsAnimationMode = {
+    SCROLL_ANIMATION: 0,
+    CLICK_ANIMATION: 1,
+};
+// ExtendBarMode (SDK: hdsBaseComponent)
+export const ExtendBarMode = {
+    HALF_SCREEN_FIXED: 100,
+};
 
 // =========================================================================
-// Stub functions
+// Instance / Attribute stub functions
 // =========================================================================
-export function HdsTabsController() { }
-
 export function HdsNavigationInstance() { }
 export function HdsNavDestinationInstance() { }
 export function HdsNavigationAttribute() { }
 export function HdsNavDestinationAttribute() { }
 export function HdsTabsInstance() { }
-export function HdsTabsAttribute() { }
 export function HdsListItemCardInstance() { }
-export function HdsListItemCardAttribute() { }
 
 // =========================================================================
 // Default export (required by GetExportObjectFromBuffer("default"))
@@ -392,20 +702,69 @@ export default {
     HdsTabs,
     HdsListItemCard,
     HdsListItem,
+    // Prefix
+    PrefixItem,
     PrefixImage,
+    PrefixIcon,
+    PrefixBadge,
+    PrefixSwitch,
+    PrefixToggleButton,
+    PrefixButton,
+    PrefixCustomBuilder,
+    // Suffix
+    SuffixItem,
+    SuffixText,
+    SuffixImage,
+    SuffixLoadingProgress,
+    SuffixRadio,
+    SuffixCheckbox,
+    SuffixSwitch,
+    SuffixArrow,
+    SuffixBadge,
     SuffixButton,
+    SuffixIcon,
+    SuffixSubIcon,
+    SuffixSelect,
+    SuffixToggleButton,
+    SuffixBadgeAndArrow,
+    SuffixTextAndArrow,
     SuffixArrowIconText,
+    SuffixCustomBuilder,
+    // Attribute / Modifier
+    HdsListItemCardAttribute,
+    HdsListItemCardModifier,
+    HdsTabsAttribute,
+    HdsTabsModifier,
+    // Controller
+    HdsTabsController,
+    // SnackBar
+    HdsSnackBar,
+    SnackBarOperationType,
+    SnackBarIconType,
+    // Material
+    hdsMaterial,
+    // Enums
     ScrollEffectType,
     HdsNavigationTitleMode,
-    DividerMode,
     HdsNavDestinationTitleMode,
-    HdsTabsController,
+    DividerMode,
+    DividerShowType,
+    TextStyleMode,
+    BottomBuilderShowType,
+    HideMode,
+    IconStyleMode,
+    BlurStrategy,
+    TitleSize,
+    IconSize,
+    HdsBarStyle,
+    HdsTabsBarChangeMode,
+    HdsAnimationMode,
+    ExtendBarMode,
+    // Instance / Attribute stubs
     HdsNavigationInstance,
     HdsNavDestinationInstance,
     HdsNavigationAttribute,
     HdsNavDestinationAttribute,
     HdsTabsInstance,
-    HdsTabsAttribute,
     HdsListItemCardInstance,
-    HdsListItemCardAttribute,
 };
