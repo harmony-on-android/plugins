@@ -869,6 +869,21 @@ export const HdsAnimationMode = {
 export const ExtendBarMode = {
     HALF_SCREEN_FIXED: 100,
 };
+// SwipeDeleteTriggerType (SDK: HdsStyle)
+export const SwipeDeleteTriggerType = {
+    NORMAL_TRIGGER: 0,
+    EASY_TRIGGER: 1,
+    NO_TRIGGER: 2,
+};
+
+// =========================================================================
+// symbolRegister namespace (SDK: symbolRegister)
+// =========================================================================
+export const symbolRegister = {
+    registerSymbol(ttfSrc, jsonSrc) {
+        return false;
+    },
+};
 
 // =========================================================================
 // Instance / Attribute stub functions
@@ -879,6 +894,7 @@ export function HdsNavigationAttribute() { }
 export function HdsNavDestinationAttribute() { }
 export function HdsTabsInstance() { }
 export function HdsListItemCardInstance() { }
+export function bleedIconStyle(builder) { }
 
 // =========================================================================
 // Default export (required by GetExportObjectFromBuffer("default"))
@@ -951,6 +967,9 @@ export default {
     HdsTabsBarChangeMode,
     HdsAnimationMode,
     ExtendBarMode,
+    SwipeDeleteTriggerType,
+    // symbolRegister
+    symbolRegister,
     // Instance / Attribute stubs
     HdsNavigationInstance,
     HdsNavDestinationInstance,
@@ -958,4 +977,5 @@ export default {
     HdsNavDestinationAttribute,
     HdsTabsInstance,
     HdsListItemCardInstance,
+    bleedIconStyle,
 };

@@ -67,5 +67,46 @@ extern "C" __attribute__((constructor)) void RegisterUIDesignKit()
     napi_module_with_js_register(&g_uidKitModule);
 }
 
+// Module registration for hds.hdsMaterial (same ABC, different module name)
+static napi_module_with_js g_hdsMaterialModule = {
+    .nm_version  = 1,
+    .nm_flags    = 0,
+    .nm_filename = nullptr,
+    .nm_register_func = nullptr,
+    .nm_modname  = "hds.hdsMaterial",
+    .nm_priv     = nullptr,
+    .nm_get_abc_code = NAPI_hds_GetABCCode,
+    .nm_get_js_code = nullptr,
+};
+
+extern "C" __attribute__((constructor)) void RegisterHdsMaterial()
+{
+    napi_module_with_js_register(&g_hdsMaterialModule);
+}
+
+// ── Additional HDS sub-modules (same ABC, different module names) ──
+
+#define HDS_SUB_MODULE(name)                                    \
+    static napi_module_with_js g_##name##Module = {             \
+        .nm_version  = 1,                                       \
+        .nm_flags    = 0,                                       \
+        .nm_filename = nullptr,                                 \
+        .nm_register_func = nullptr,                            \
+        .nm_modname  = "hds.hds." #name,                        \
+        .nm_priv     = nullptr,                                 \
+        .nm_get_abc_code = NAPI_hds_GetABCCode,                 \
+        .nm_get_js_code = nullptr,                              \
+    };                                                          \
+    extern "C" __attribute__((constructor)) void Register##name() \
+    {                                                           \
+        napi_module_with_js_register(&g_##name##Module);        \
+    }
+
+HDS_SUB_MODULE(HdsSnackBar)
+HDS_SUB_MODULE(HdsActionBar)
+HDS_SUB_MODULE(HdsSideBar)
+HDS_SUB_MODULE(symbolRegister)
+HDS_SUB_MODULE(HdsStyle)
+
 }  // namespace
 }  // namespace OHOS::Plugin
