@@ -98,6 +98,8 @@ common_plugin_libs = [
   "hms/hds",
   "hms/security",
   "hms/push",
+  "hms/account",
+  "hms/iap",
   "hilog",
   "taskpool",
   "test_plugin",

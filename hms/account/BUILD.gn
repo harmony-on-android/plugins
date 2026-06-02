@@ -16,43 +16,43 @@ import("//build/ohos.gni")
 import("//foundation/arkui/ace_engine/ace_config.gni")
 import("//foundation/arkui/ace_engine/build/ace_gen_obj.gni")
 
-_push_mock_js = "$ace_root/../../../plugins/hms/push/src/hms_push_mock.js"
+_account_mock_js = "$ace_root/../../../plugins/hms/account/src/hms_account_mock.js"
 
 # Phase 1: compile JS mock source to ABC (host toolchain)
-es2abc_gen_abc("gen_hms_push_abc") {
-  src_js = rebase_path("$_push_mock_js")
-  dst_file = rebase_path(target_out_dir + "/hms_push_mock.abc")
-  in_puts = [ "$_push_mock_js" ]
-  out_puts = [ target_out_dir + "/hms_push_mock.abc" ]
+es2abc_gen_abc("gen_hms_account_abc") {
+  src_js = rebase_path("$_account_mock_js")
+  dst_file = rebase_path(target_out_dir + "/hms_account_mock.abc")
+  in_puts = [ "$_account_mock_js" ]
+  out_puts = [ target_out_dir + "/hms_account_mock.abc" ]
   extra_args = [ "--module" ]
 }
 
 # Phase 2: embed ABC into native object (target toolchain)
 if (target_os == "ios") {
-  gen_obj("hms_push_abc") {
+  gen_obj("hms_account_abc") {
     input =
-        get_label_info(":gen_hms_push_abc", "target_out_dir") + "/hms_push_mock.abc"
-    output = target_out_dir + "/hms_push_abc.c"
-    snapshot_dep = [ ":gen_hms_push_abc" ]
+        get_label_info(":gen_hms_account_abc", "target_out_dir") + "/hms_account_mock.abc"
+    output = target_out_dir + "/hms_account_abc.c"
+    snapshot_dep = [ ":gen_hms_account_abc" ]
   }
 } else if (target_os == "android") {
-  gen_js_obj("hms_push_abc") {
+  gen_js_obj("hms_account_abc") {
     input =
-        get_label_info(":gen_hms_push_abc", "target_out_dir") + "/hms_push_mock.abc"
-    output = target_out_dir + "/hms_push_abc.o"
-    dep = ":gen_hms_push_abc"
+        get_label_info(":gen_hms_account_abc", "target_out_dir") + "/hms_account_mock.abc"
+    output = target_out_dir + "/hms_account_abc.o"
+    dep = ":gen_hms_account_abc"
   }
 }
 
 # Phase 3: link C++ stub + embedded ABC into shared library
-template("plugin_hms_push_static") {
+template("plugin_hms_account_static") {
   forward_variables_from(invoker, "*")
 
   ohos_source_set(target_name) {
     defines += invoker.defines
     cflags_cc += invoker.cflags_cc
 
-    sources = [ "hms_push_stub.cpp" ]
+    sources = [ "hms_account_stub.cpp" ]
 
     deps = [
       "//plugins/interfaces/native:ace_plugin_util_${platform}",
@@ -60,9 +60,9 @@ template("plugin_hms_push_static") {
     ]
 
     if (target_os == "ios") {
-      deps += [ ":gen_obj_src_hms_push_abc" ]
+      deps += [ ":gen_obj_src_hms_account_abc" ]
     } else if (target_os == "android") {
-      deps += [ ":hms_push_abc" ]
+      deps += [ ":hms_account_abc" ]
     }
 
     subsystem_name = "plugins"
@@ -71,7 +71,7 @@ template("plugin_hms_push_static") {
 }
 
 foreach(item, ace_platforms) {
-  plugin_hms_push_static("hms_push_static_" + item.name) {
+  plugin_hms_account_static("hms_account_static_" + item.name) {
     platform = item.name
 
     defines = []
