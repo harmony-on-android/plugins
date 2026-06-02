@@ -11,24 +11,28 @@
  */
 
 // =========================================================================
-// extendService namespace — enums
+// extendService namespace — enums (values match SDK 23+ declarations)
 // =========================================================================
 var ExtendErrorCode = {
-    INTERNAL_ERROR: 1001600000,
+    INVALID_PARAMETER: 401,
     NETWORK_ERROR: 1001600001,
-    USER_CANCEL: 1001600002,
-    PERMISSION_DENIED: 1001600003
+    ACCOUNT_NOT_LOGGED_IN: 1001600002,
+    PACKAGE_FINGERPRINT_CHECK_ERROR: 1001600003,
+    PERMISSION_CHECK_ERROR: 1001600004,
+    USER_CANCELED: 1001600005,
+    VERIFICATION_FACTOR_UNAVAILABLE: 1001600006,
+    INTERNAL_ERROR: 1001600007,
+    DEVICE_NOT_SUPPORTED: 1001600011
 };
 
 var IdType = {
-    ID_CARD: 0,
-    PASSPORT: 1,
-    DRIVER_LICENSE: 2
+    USER_ID: 1,
+    OPEN_ID: 2,
+    UNION_ID: 3
 };
 
 var RiskLevel = {
-    LOW: 0,
-    MEDIUM: 1,
+    LOW: 1,
     HIGH: 2
 };
 
@@ -37,11 +41,7 @@ var RiskLevel = {
 // =========================================================================
 function verifyAccount(context, request, callback) {
     var mockResult = {
-        resultCode: 0,
-        idType: "ID_CARD",
-        idNumber: "mock-identity-****************",
-        name: "Mock User",
-        riskLevel: RiskLevel.LOW
+        verifyToken: "mock-verify-token.eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtb2NrLXVzZXIifQ.mock-signature"
     };
     if (typeof callback === 'function') {
         callback(undefined, mockResult);
