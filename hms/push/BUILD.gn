@@ -1,0 +1,32 @@
+# HMS Push API stub for ArkUI-X
+# Provides mock implementations of pushService and pushCommon.
+
+import("//build/config/ohos_plugin.gni")
+
+ohos_shared_library("hms_push") {
+  subsystem_name = "hms"
+  part_name = "push"
+
+  sources = [
+    "hms_push_stub.cpp",
+  ]
+
+  ldflags = [
+    "-Wl,--whole-archive",
+    rebase_path("${target_gen_dir}/hms_push_mock.o"),
+    "-Wl,--no-whole-archive",
+  ]
+
+  deps = [
+    "//foundation/arkui/napi:napi",
+  ]
+
+  cflags_cc = [
+    "-std=gnu++17",
+  ]
+
+  defines = []
+
+  output_name = "libhms_push"
+  install_enable = true
+}
