@@ -96,6 +96,7 @@ common_plugin_libs = [
   "util/json",
   "util/stream",
   "hms/hds",
+  "hms/security",
   "hilog",
   "taskpool",
   "test_plugin",
