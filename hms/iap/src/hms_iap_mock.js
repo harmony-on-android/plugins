@@ -42,32 +42,25 @@ function queryProducts(context, parameter, callback) {
     return Promise.resolve(mockProducts);
 }
 
+// Payment write operations always fail — HOA has no real IAP backend.
+// Returning success would mislead HAPs into thinking a payment succeeded.
+
 function purchase(context, parameter, callback) {
-    var mockResult = {
-        code: 0,
-        message: "mock-purchase-success",
-        purchaseToken: "mock-purchase-token-00000000-0000-0000-0000-000000000000",
-        productId: "mock-product-001",
-        productType: ProductType.CONSUMABLE
-    };
+    var err = { code: 1001860007, message: "HOA: IAP not supported" };
     if (typeof callback === 'function') {
-        callback(undefined, mockResult);
+        callback(err);
         return;
     }
-    return Promise.resolve(mockResult);
+    return Promise.reject(err);
 }
 
 function createPurchase(context, parameter, callback) {
-    var mockResult = {
-        code: 0,
-        message: "mock-create-purchase-success",
-        purchaseToken: "mock-create-token-00000000-0000-0000-0000-000000000000"
-    };
+    var err = { code: 1001860007, message: "HOA: IAP not supported" };
     if (typeof callback === 'function') {
-        callback(undefined, mockResult);
+        callback(err);
         return;
     }
-    return Promise.resolve(mockResult);
+    return Promise.reject(err);
 }
 
 function queryOwnedPurchases(context, parameter, callback) {
@@ -84,66 +77,56 @@ function queryOwnedPurchases(context, parameter, callback) {
 }
 
 function consumePurchase(context, parameter, callback) {
-    var mockResult = {
-        code: 0,
-        message: "mock-consume-success"
-    };
+    var err = { code: 1001860007, message: "HOA: IAP not supported" };
     if (typeof callback === 'function') {
-        callback(undefined, mockResult);
+        callback(err);
         return;
     }
-    return Promise.resolve(mockResult);
+    return Promise.reject(err);
 }
 
 function finishPurchase(context, parameter, callback) {
+    var err = { code: 1001860007, message: "HOA: IAP not supported" };
     if (typeof callback === 'function') {
-        callback(undefined);
+        callback(err);
         return;
     }
-    return Promise.resolve();
+    return Promise.reject(err);
 }
 
 // =========================================================================
 // paymentService namespace — functions
 // =========================================================================
 function requestPayment(context, orderStr, payload, callback) {
-    var mockResult = {
-        code: 0,
-        message: "mock-payment-success"
-    };
+    var err = { code: 1001860008, message: "HOA: payment not supported" };
     if (typeof callback === 'function') {
-        callback(undefined, mockResult);
+        callback(err);
         return;
     }
-    return Promise.resolve(mockResult);
+    return Promise.reject(err);
 }
 
 function cashierPicker(context, paymentInfo) {
-    var mockResult = {
-        code: 0,
-        message: "mock-picker-success"
-    };
-    return Promise.resolve(mockResult);
+    var err = { code: 1001860008, message: "HOA: payment not supported" };
+    return Promise.reject(err);
 }
 
 function requestContract(context, contractStr, callback) {
+    var err = { code: 1001860008, message: "HOA: payment not supported" };
     if (typeof callback === 'function') {
-        callback(undefined);
+        callback(err);
         return;
     }
-    return Promise.resolve();
+    return Promise.reject(err);
 }
 
 function requestBindCard(context, callback) {
-    var mockResult = {
-        code: 0,
-        message: "mock-bind-card-success"
-    };
+    var err = { code: 1001860008, message: "HOA: payment not supported" };
     if (typeof callback === 'function') {
-        callback(undefined, mockResult);
+        callback(err);
         return;
     }
-    return Promise.resolve(mockResult);
+    return Promise.reject(err);
 }
 
 // =========================================================================
