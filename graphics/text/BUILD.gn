@@ -60,6 +60,7 @@ ohos_source_set("graphics_text_static") {
   ]
 
   deps = [
+    "$rosen_text_root/service:rosen_text_skia",
     "//plugins/libs/napi:napi_${target_os}",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog_${target_os}",
   ]
