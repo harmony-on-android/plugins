@@ -205,6 +205,24 @@ private:
 
     static napi_value JsClearAllCookiesAsync(napi_env env, napi_callback_info info);
 
+    static napi_value JsFetchCookieSync(napi_env env, napi_callback_info info);
+
+    static napi_value JsConfigCookieSync(napi_env env, napi_callback_info info);
+
+    static napi_value JsClearAllCookiesSync(napi_env env, napi_callback_info info);
+
+    static napi_value JsClearSessionCookieSync(napi_env env, napi_callback_info info);
+
+    static napi_value JsIsCookieAllowed(napi_env env, napi_callback_info info);
+
+    static napi_value JsIsThirdPartyCookieAllowed(napi_env env, napi_callback_info info);
+
+    static napi_value JsPutAcceptCookieEnabled(napi_env env, napi_callback_info info);
+
+    static napi_value JsPutAcceptThirdPartyCookieEnabled(napi_env env, napi_callback_info info);
+
+    static napi_value JsSaveCookieAsync(napi_env env, napi_callback_info info);
+
     static void CreateCookieAsyncWork(napi_env env, const std::string& taskName,
         const std::shared_ptr<AsyncCookieManagerResultCallbackInfo>& callbackInfo);
 

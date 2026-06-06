@@ -28,6 +28,12 @@ public:
     static void ClearAllCookies(int32_t asyncCallbackInfoId);
     static bool ExistCookie(bool incognito);
     static void ClearSessionCookie(int32_t asyncCallbackInfoId);
+    static std::string FetchCookieSync(const std::string& url);
+    static void ConfigCookieSync(const std::string& url, const std::string& value);
+    static void ClearAllCookiesSync();
+    static void ClearSessionCookieSync();
+    static bool IsCookieAllowed();
+    static bool IsThirdPartyCookieAllowed();
 };
 } // namespace OHOS::Plugin
 

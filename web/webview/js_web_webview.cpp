@@ -2234,11 +2234,27 @@ extern "C" __attribute__((constructor)) void WebWebviewRegister()
 napi_value NapiWebCookieManager::Init(napi_env env, napi_value exports)
 {
     napi_property_descriptor properties[] = {
+        // async (Promise) APIs
         DECLARE_NAPI_STATIC_FUNCTION("fetchCookie", NapiWebCookieManager::JsFetchCookieAsync),
         DECLARE_NAPI_STATIC_FUNCTION("configCookie", NapiWebCookieManager::JsConfigCookieAsync),
         DECLARE_NAPI_STATIC_FUNCTION("clearAllCookies", NapiWebCookieManager::JsClearAllCookiesAsync),
         DECLARE_NAPI_STATIC_FUNCTION("existCookie", NapiWebCookieManager::JsExistCookie),
         DECLARE_NAPI_STATIC_FUNCTION("clearSessionCookie", NapiWebCookieManager::JsClearSessionCookie),
+        // sync APIs
+        DECLARE_NAPI_STATIC_FUNCTION("fetchCookieSync", NapiWebCookieManager::JsFetchCookieSync),
+        DECLARE_NAPI_STATIC_FUNCTION("configCookieSync", NapiWebCookieManager::JsConfigCookieSync),
+        DECLARE_NAPI_STATIC_FUNCTION("clearAllCookiesSync", NapiWebCookieManager::JsClearAllCookiesSync),
+        DECLARE_NAPI_STATIC_FUNCTION("clearSessionCookieSync", NapiWebCookieManager::JsClearSessionCookieSync),
+        DECLARE_NAPI_STATIC_FUNCTION("isCookieAllowed", NapiWebCookieManager::JsIsCookieAllowed),
+        DECLARE_NAPI_STATIC_FUNCTION("isThirdPartyCookieAllowed", NapiWebCookieManager::JsIsThirdPartyCookieAllowed),
+        DECLARE_NAPI_STATIC_FUNCTION("putAcceptCookieEnabled", NapiWebCookieManager::JsPutAcceptCookieEnabled),
+        DECLARE_NAPI_STATIC_FUNCTION("putAcceptThirdPartyCookieEnabled", NapiWebCookieManager::JsPutAcceptThirdPartyCookieEnabled),
+        DECLARE_NAPI_STATIC_FUNCTION("saveCookieAsync", NapiWebCookieManager::JsSaveCookieAsync),
+        // deprecated aliases for OHOS compatibility
+        DECLARE_NAPI_STATIC_FUNCTION("getCookie", NapiWebCookieManager::JsFetchCookieSync),
+        DECLARE_NAPI_STATIC_FUNCTION("setCookie", NapiWebCookieManager::JsConfigCookieSync),
+        DECLARE_NAPI_STATIC_FUNCTION("deleteEntireCookie", NapiWebCookieManager::JsClearAllCookiesSync),
+        DECLARE_NAPI_STATIC_FUNCTION("deleteSessionCookie", NapiWebCookieManager::JsClearSessionCookieSync),
     };
     napi_value constructor = nullptr;
 
@@ -2444,19 +2460,126 @@ napi_value NapiWebCookieManager::JsExistCookie(napi_env env, napi_callback_info 
 {
 	napi_value thisVar = nullptr;
 	napi_value result = nullptr;
-	size_t argc = INTEGER_ONE; 
+	size_t argc = INTEGER_ONE;
 	napi_value argv[INTEGER_ONE] = { 0 };
-	bool incognito = false; 
+	bool incognito = false;
 	napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
 	if (argc > INTEGER_ZERO) {
 	    if (!NapiParseUtils::ParseBoolean(env, argv[0], incognito)) {
 	        BusinessError::ThrowErrorByErrcode(env, PARAM_CHECK_ERROR);
-	        return nullptr; 
+	        return nullptr;
 	    }
 	}
 	bool exist = WebCookieManager::ExistCookie(incognito);
 	NAPI_CALL(env, napi_get_boolean(env, exist, &result));
 	return result;
+}
+
+napi_value NapiWebCookieManager::JsFetchCookieSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    napi_value result = nullptr;
+    size_t argc = INTEGER_ONE;
+    napi_value argv[INTEGER_ONE] = { 0 };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    std::string url;
+    if (!NapiParseUtils::ParseString(env, argv[0], url)) {
+        BusinessError::ThrowErrorByErrcode(env, PARAM_CHECK_ERROR);
+        return nullptr;
+    }
+    std::string cookie = WebCookieManager::FetchCookieSync(url);
+    NAPI_CALL(env, napi_create_string_utf8(env, cookie.c_str(), NAPI_AUTO_LENGTH, &result));
+    return result;
+}
+
+napi_value NapiWebCookieManager::JsConfigCookieSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    size_t argc = INTEGER_TWO;
+    napi_value argv[INTEGER_TWO] = { 0 };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    std::string url;
+    std::string value;
+    if (!NapiParseUtils::ParseString(env, argv[0], url) ||
+        !NapiParseUtils::ParseString(env, argv[1], value)) {
+        BusinessError::ThrowErrorByErrcode(env, PARAM_CHECK_ERROR);
+        return nullptr;
+    }
+    WebCookieManager::ConfigCookieSync(url, value);
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
+}
+
+napi_value NapiWebCookieManager::JsClearAllCookiesSync(napi_env env, napi_callback_info info)
+{
+    WebCookieManager::ClearAllCookiesSync();
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
+}
+
+napi_value NapiWebCookieManager::JsClearSessionCookieSync(napi_env env, napi_callback_info info)
+{
+    WebCookieManager::ClearSessionCookieSync();
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
+}
+
+napi_value NapiWebCookieManager::JsIsCookieAllowed(napi_env env, napi_callback_info info)
+{
+    napi_value result = nullptr;
+    bool allowed = WebCookieManager::IsCookieAllowed();
+    NAPI_CALL(env, napi_get_boolean(env, allowed, &result));
+    return result;
+}
+
+napi_value NapiWebCookieManager::JsIsThirdPartyCookieAllowed(napi_env env, napi_callback_info info)
+{
+    napi_value result = nullptr;
+    bool allowed = WebCookieManager::IsThirdPartyCookieAllowed();
+    NAPI_CALL(env, napi_get_boolean(env, allowed, &result));
+    return result;
+}
+
+napi_value NapiWebCookieManager::JsPutAcceptCookieEnabled(napi_env env, napi_callback_info info)
+{
+    // Android: cookie acceptance is already set in AceWeb.initWeb()
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
+}
+
+napi_value NapiWebCookieManager::JsPutAcceptThirdPartyCookieEnabled(napi_env env, napi_callback_info info)
+{
+    // Android: third-party cookie acceptance is already set in AceWeb.initWeb()
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
+}
+
+napi_value NapiWebCookieManager::JsSaveCookieAsync(napi_env env, napi_callback_info info)
+{
+    // Android: cookies are auto-persisted by CookieManager
+    // Trigger callback with null if a callback is provided
+    napi_value thisVar = nullptr;
+    napi_value result = nullptr;
+    size_t argc = INTEGER_ONE;
+    napi_value argv[INTEGER_ONE] = { 0 };
+    napi_get_undefined(env, &result);
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc == INTEGER_ONE) {
+        napi_valuetype valueType = napi_null;
+        napi_typeof(env, argv[0], &valueType);
+        if (valueType == napi_function) {
+            napi_value callbackResult = nullptr;
+            napi_value nullResult = nullptr;
+            napi_get_null(env, &nullResult);
+            napi_call_function(env, nullptr, argv[0], INTEGER_ONE, &nullResult, &callbackResult);
+        }
+    }
+    return result;
 }
 
 void NapiWebCookieManager::CreateCookieAsyncWork(napi_env env, const std::string& taskName,

@@ -250,4 +250,67 @@ void WebCookieManager::ClearSessionCookie(int32_t asyncCallbackInfoId)
     WebCookieManagerIOS::ClearSessionCookie(asyncCallbackInfoId);
 #endif
 }
+
+std::string WebCookieManager::FetchCookieSync(const std::string& url)
+{
+#ifdef ANDROID_PLATFORM
+    return WebCookieManagerAndroid::FetchCookieSync(url);
+#endif
+#ifdef IOS_PLATFORM
+    return WebCookieManagerIOS::FetchCookieSync(url);
+#endif
+    return "";
+}
+
+void WebCookieManager::ConfigCookieSync(const std::string& url, const std::string& value)
+{
+#ifdef ANDROID_PLATFORM
+    WebCookieManagerAndroid::ConfigCookieSync(url, value);
+#endif
+#ifdef IOS_PLATFORM
+    WebCookieManagerIOS::ConfigCookieSync(url, value);
+#endif
+}
+
+void WebCookieManager::ClearAllCookiesSync()
+{
+#ifdef ANDROID_PLATFORM
+    WebCookieManagerAndroid::ClearAllCookiesSync();
+#endif
+#ifdef IOS_PLATFORM
+    WebCookieManagerIOS::ClearAllCookiesSync();
+#endif
+}
+
+void WebCookieManager::ClearSessionCookieSync()
+{
+#ifdef ANDROID_PLATFORM
+    WebCookieManagerAndroid::ClearSessionCookieSync();
+#endif
+#ifdef IOS_PLATFORM
+    WebCookieManagerIOS::ClearSessionCookieSync();
+#endif
+}
+
+bool WebCookieManager::IsCookieAllowed()
+{
+#ifdef ANDROID_PLATFORM
+    return WebCookieManagerAndroid::IsCookieAllowed();
+#endif
+#ifdef IOS_PLATFORM
+    return WebCookieManagerIOS::IsCookieAllowed();
+#endif
+    return false;
+}
+
+bool WebCookieManager::IsThirdPartyCookieAllowed()
+{
+#ifdef ANDROID_PLATFORM
+    return WebCookieManagerAndroid::IsThirdPartyCookieAllowed();
+#endif
+#ifdef IOS_PLATFORM
+    return WebCookieManagerIOS::IsThirdPartyCookieAllowed();
+#endif
+    return false;
+}
 } // namespace OHOS::Plugin

@@ -103,6 +103,88 @@ public class WebCookiePlugin {
     }
 
     /**
+     * Get cookie value synchronously.
+     *
+     * @param url url
+     * @return cookie string
+     */
+    public String fetchCookieSync(String url) {
+        String cookies = CookieManager.getInstance().getCookie(url);
+        return (cookies != null) ? cookies : "";
+    }
+
+    /**
+     * Set cookie value synchronously.
+     *
+     * @param url url
+     * @param value cookie value
+     */
+    public void configCookieSync(String url, String value) {
+        CookieManager.getInstance().setCookie(url, value);
+    }
+
+    /**
+     * Clear all cookies synchronously.
+     */
+    public void clearAllCookiesSync() {
+        CookieManager.getInstance().removeAllCookies(null);
+    }
+
+    /**
+     * Clear session cookies synchronously.
+     */
+    public void clearSessionCookieSync() {
+        CookieManager.getInstance().removeSessionCookies(null);
+    }
+
+    /**
+     * Check whether cookies are allowed.
+     *
+     * @return true if cookies are accepted
+     */
+    public boolean isCookieAllowed() {
+        return CookieManager.getInstance().acceptCookie();
+    }
+
+    /**
+     * Check whether third-party cookies are allowed.
+     * HOA always enables third-party cookies in AceWeb.initWeb().
+     *
+     * @return true
+     */
+    public boolean isThirdPartyCookieAllowed() {
+        return true;
+    }
+
+    /**
+     * Enable or disable cookie acceptance (no-op on Android).
+     * Cookie acceptance is already set in AceWeb.initWeb().
+     *
+     * @param enabled whether to accept cookies
+     */
+    public void putAcceptCookieEnabled(boolean enabled) {
+        // Already handled by AceWeb.initWeb()
+    }
+
+    /**
+     * Enable or disable third-party cookie acceptance (no-op on Android).
+     * Third-party cookie acceptance is already set in AceWeb.initWeb().
+     *
+     * @param enabled whether to accept third-party cookies
+     */
+    public void putAcceptThirdPartyCookieEnabled(boolean enabled) {
+        // Already handled by AceWeb.initWeb()
+    }
+
+    /**
+     * Save cookie asynchronously (no-op on Android).
+     * Android CookieManager automatically persists cookies to RAM.
+     */
+    public void saveCookieAsync() {
+        // Android auto-persists cookies, no explicit save needed
+    }
+
+    /**
      * Initialize the native environment.
      */
     protected native void nativeInit();

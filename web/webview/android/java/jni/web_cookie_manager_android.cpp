@@ -47,4 +47,34 @@ void WebCookieManagerAndroid::ClearSessionCookie(int32_t asyncCallbackInfoId)
 {
     WebCookieManagerJni::ClearSessionCookie(asyncCallbackInfoId);
 }
+
+std::string WebCookieManagerAndroid::FetchCookieSync(const std::string& url)
+{
+    return WebCookieManagerJni::FetchCookieSync(url);
+}
+
+void WebCookieManagerAndroid::ConfigCookieSync(const std::string& url, const std::string& value)
+{
+    WebCookieManagerJni::ConfigCookieSync(url, value);
+}
+
+void WebCookieManagerAndroid::ClearAllCookiesSync()
+{
+    WebCookieManagerJni::ClearAllCookiesSync();
+}
+
+void WebCookieManagerAndroid::ClearSessionCookieSync()
+{
+    WebCookieManagerJni::ClearSessionCookieSync();
+}
+
+bool WebCookieManagerAndroid::IsCookieAllowed()
+{
+    return WebCookieManagerJni::IsCookieAllowed();
+}
+
+bool WebCookieManagerAndroid::IsThirdPartyCookieAllowed()
+{
+    return WebCookieManagerJni::IsThirdPartyCookieAllowed();
+}
 } // namespace OHOS::Plugin
