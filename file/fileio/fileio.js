@@ -1,259 +1,87 @@
-// Stub for @ohos.fileio API compatibility on ArkUI-X/Android
-// Flattened default export pattern: all functions and classes are direct
-// properties of the default export, matching how import fileio from '@ohos.fileio' works.
-
-function access(path, mode) {
-  return Promise.resolve(true);
-}
-
-function accessSync(path, mode) {
-  return true;
-}
-
-function chmod(path, mode) {
-  return Promise.resolve();
-}
-
-function chmodSync(path, mode) {}
-
-function chown(path, uid, gid) {
-  return Promise.resolve();
-}
-
-function chownSync(path, uid, gid) {}
-
-function close(fd) {
-  return Promise.resolve();
-}
-
-function closeSync(fd) {}
-
-function copyFile(src, dest, mode) {
-  return Promise.resolve();
-}
-
-function copyFileSync(src, dest, mode) {}
-
-function createStream(fd) {
-  return Promise.resolve(new Stream());
-}
-
-function createStreamSync(fd) {
-  return new Stream();
-}
-
-class Dir {
-  read() { return Promise.resolve(new Dirent()); }
-  readSync() { return new Dirent(); }
-  close() { return Promise.resolve(); }
-  closeSync() {}
-}
-
-class Dirent {
-  constructor() {
-    this.name = "";
-  }
-  isDirectory() { return false; }
-  isFile() { return false; }
-}
-
-class Stat {
-  constructor() {
-    this.size = 0;
-    this.blksize = 4096;
-    this.blocks = 0;
-    this.atime = 0;
-    this.mtime = 0;
-    this.ctime = 0;
-    this.ino = 0;
-    this.mode = 0;
-    this.uid = 0;
-    this.gid = 0;
-    this.dev = 0;
-    this.nlink = 0;
-  }
-  isDirectory() { return false; }
-  isFile() { return false; }
-  isSymbolicLink() { return false; }
-}
-
-class Stream {
-  read(buffer, options) { return Promise.resolve(0); }
-  readSync(buffer, options) { return 0; }
-  write(buffer, options) { return Promise.resolve(0); }
-  writeSync(buffer, options) { return 0; }
-  close() { return Promise.resolve(); }
-  closeSync() {}
-  flush() { return Promise.resolve(); }
-  flushSync() {}
-}
-
-class Watcher {
-  start() {}
-  stop() {}
-}
-
-function fchmod(fd, mode) {
-  return Promise.resolve();
-}
-
-function fchmodSync(fd, mode) {}
-
-function fchown(fd, uid, gid) {
-  return Promise.resolve();
-}
-
-function fchownSync(fd, uid, gid) {}
-
-function fdatasync(fd) {
-  return Promise.resolve();
-}
-
-function fdatasyncSync(fd) {}
-
-function fdopenStream(fd) {
-  return Promise.resolve(new Stream());
-}
-
-function fdopenStreamSync(fd) {
-  return new Stream();
-}
-
-function fsync(fd) {
-  return Promise.resolve();
-}
-
-function fsyncSync(fd) {}
-
-function ftruncate(fd, len) {
-  return Promise.resolve();
-}
-
-function ftruncateSync(fd, len) {}
-
-function lchown(path, uid, gid) {
-  return Promise.resolve();
-}
-
-function lchownSync(path, uid, gid) {}
-
-function link(src, dest) {
-  return Promise.resolve();
-}
-
-function linkSync(src, dest) {}
-
-function lseek(fd, offset, whence) {
-  return 0;
-}
-
-function lstat(path) {
-  return Promise.resolve(new Stat());
-}
-
-function lstatSync(path) {
-  return new Stat();
-}
-
-function mkdir(path, mode) {
-  return Promise.resolve();
-}
-
-function mkdirSync(path, mode) {}
-
-function mkdtemp(prefix) {
-  return Promise.resolve("/tmp/mock");
-}
-
-function mkdtempSync(prefix) {
-  return "/tmp/mock";
-}
-
-function open(path, flags, mode) {
-  return Promise.resolve(-1);
-}
-
-function openSync(path, flags, mode) {
-  return -1;
-}
-
-function opendir(path) {
-  return Promise.resolve(new Dir());
-}
-
-function opendirSync(path) {
-  return new Dir();
-}
-
-function read(fd, buffer, options) {
-  return Promise.resolve(0);
-}
-
-function readSync(fd, buffer, options) {
-  return 0;
-}
-
-function readText(filePath, options) {
-  return Promise.resolve("");
-}
-
-function readTextSync(filePath, options) {
-  return "";
-}
-
-function rename(src, dest) {
-  return Promise.resolve();
-}
-
-function renameSync(src, dest) {}
-
-function rmdir(path) {
-  return Promise.resolve();
-}
-
-function rmdirSync(path) {}
-
-function stat(path) {
-  return Promise.resolve(new Stat());
-}
-
-function statSync(path) {
-  return new Stat();
-}
-
-function symlink(target, src) {
-  return Promise.resolve();
-}
-
-function symlinkSync(target, src) {}
-
-function truncate(path, len) {
-  return Promise.resolve();
-}
-
-function truncateSync(path, len) {}
-
-function unlink(path) {
-  return Promise.resolve();
-}
-
-function unlinkSync(path) {}
-
-function write(fd, buffer, options) {
-  return Promise.resolve(0);
-}
-
-function writeSync(fd, buffer, options) {
-  return 0;
-}
-
-function writeText(filePath, content) {
-  return Promise.resolve();
-}
-
-function writeTextSync(filePath, content) {}
-
-var OpenMode = {
+// @ohos.fileio — delegation to @ohos.file.fs (native implementation)
+//
+// OHOS deprecated @ohos.fileio in API 9, replacing it with @ohos.file.fs.
+// Instead of reimplementing POSIX operations, we delegate to the existing
+// native libfile_fs.so (loaded as @ohos.file.fs).
+//
+// Flattened default export pattern matches how HAPs import:
+//   import fileio from '@ohos.fileio'
+
+import fs from '@ohos.file.fs';
+
+// ── Direct 1:1 delegations ──
+
+function access(path, mode) { return fs.access(path, mode); }
+function accessSync(path, mode) { return fs.accessSync(path, mode); }
+function chmod(path, mode) { return fs.chmod(path, mode); }
+function chmodSync(path, mode) { return fs.chmodSync(path, mode); }
+function chown(path, uid, gid) { return fs.chown(path, uid, gid); }
+function chownSync(path, uid, gid) { return fs.chownSync(path, uid, gid); }
+function close(fd) { return fs.close(fd); }
+function closeSync(fd) { return fs.closeSync(fd); }
+function copyFile(src, dest, mode) { return fs.copyFile(src, dest, mode); }
+function copyFileSync(src, dest, mode) { return fs.copyFileSync(src, dest, mode); }
+function fchmod(fd, mode) { return fs.fchmod(fd, mode); }
+function fchmodSync(fd, mode) { return fs.fchmodSync(fd, mode); }
+function fchown(fd, uid, gid) { return fs.fchown(fd, uid, gid); }
+function fchownSync(fd, uid, gid) { return fs.fchownSync(fd, uid, gid); }
+function fdatasync(fd) { return fs.fdatasync(fd); }
+function fdatasyncSync(fd) { return fs.fdatasyncSync(fd); }
+function fsync(fd) { return fs.fsync(fd); }
+function fsyncSync(fd) { return fs.fsyncSync(fd); }
+function ftruncate(fd, len) { return fs.ftruncate(fd, len); }
+function ftruncateSync(fd, len) { return fs.ftruncateSync(fd, len); }
+function lchown(path, uid, gid) { return fs.lchown(path, uid, gid); }
+function lchownSync(path, uid, gid) { return fs.lchownSync(path, uid, gid); }
+function link(src, dest) { return fs.link(src, dest); }
+function linkSync(src, dest) { return fs.linkSync(src, dest); }
+function lseek(fd, offset, whence) { return fs.lseek(fd, offset, whence); }
+function lstat(path) { return fs.lstat(path); }
+function lstatSync(path) { return fs.lstatSync(path); }
+function mkdir(path, mode) { return fs.mkdir(path, mode); }
+function mkdirSync(path, mode) { return fs.mkdirSync(path, mode); }
+function mkdtemp(prefix) { return fs.mkdtemp(prefix); }
+function mkdtempSync(prefix) { return fs.mkdtempSync(prefix); }
+function open(path, flags, mode) { return fs.open(path, flags, mode); }
+function openSync(path, flags, mode) { return fs.openSync(path, flags, mode); }
+function opendir(path) { return fs.opendir(path); }
+function opendirSync(path) { return fs.opendirSync(path); }
+function read(fd, buffer, options) { return fs.read(fd, buffer, options); }
+function readSync(fd, buffer, options) { return fs.readSync(fd, buffer, options); }
+function readText(filePath, options) { return fs.readText(filePath, options); }
+function readTextSync(filePath, options) { return fs.readTextSync(filePath, options); }
+function rename(src, dest) { return fs.rename(src, dest); }
+function renameSync(src, dest) { return fs.renameSync(src, dest); }
+function rmdir(path) { return fs.rmdir(path); }
+function rmdirSync(path) { return fs.rmdirSync(path); }
+function stat(path) { return fs.stat(path); }
+function statSync(path) { return fs.statSync(path); }
+function symlink(target, src) { return fs.symlink(target, src); }
+function symlinkSync(target, src) { return fs.symlinkSync(target, src); }
+function truncate(path, len) { return fs.truncate(path, len); }
+function truncateSync(path, len) { return fs.truncateSync(path, len); }
+function unlink(path) { return fs.unlink(path); }
+function unlinkSync(path) { return fs.unlinkSync(path); }
+function write(fd, buffer, options) { return fs.write(fd, buffer, options); }
+function writeSync(fd, buffer, options) { return fs.writeSync(fd, buffer, options); }
+function writeText(filePath, content) { return fs.writeText(filePath, content); }
+function writeTextSync(filePath, content) { return fs.writeTextSync(filePath, content); }
+
+// Stream wrappers — old API creates Stream from fd; new API has fdopenStream/createStream
+function createStream(path, mode) { return fs.createStream(path, mode); }
+function createStreamSync(path, mode) { return fs.createStreamSync(path, mode); }
+function fdopenStream(fd) { return fs.fdopenStream(fd); }
+function fdopenStreamSync(fd) { return fs.fdopenStreamSync(fd); }
+
+// ── Re-exports: types from new API ──
+const Stat = fs.Stat;
+const Stream = fs.Stream;
+const Dir = fs.Dir;
+const Dirent = fs.Dirent;
+const Watcher = fs.Watcher;
+
+// ── Constants (same values as OHOS) ──
+const OpenMode = {
   READ_ONLY: 0o0,
   WRITE_ONLY: 0o1,
   READ_WRITE: 0o2,
@@ -265,16 +93,17 @@ var OpenMode = {
   SYNC: 0o4010000,
 };
 
-var WhenceType = {
+const WhenceType = {
   SEEK_SET: 0,
   SEEK_CUR: 1,
   SEEK_END: 2,
 };
 
-var Filter = {
+const Filter = {
   EXCLUDE_START_WITH_DOT: 1,
 };
 
+// ── Flat default export ──
 export default {
   access,
   accessSync,
