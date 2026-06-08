@@ -1,0 +1,3 @@
+group("all_plugins") {
+  deps = [ "//plugins/bridge:bridge_static_android" ]
+}
