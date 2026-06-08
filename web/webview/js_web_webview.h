@@ -132,6 +132,12 @@ private:
 
     static napi_value SetWebDebuggingAccess(napi_env env, napi_callback_info info);
 
+    static napi_value GetDefaultUserAgent(napi_env env, napi_callback_info info);
+
+    static napi_value SetAppCustomUserAgent(napi_env env, napi_callback_info info);
+
+    static napi_value SetUserAgentForHosts(napi_env env, napi_callback_info info);
+
     static napi_value PageDown(napi_env env, napi_callback_info info);
 
     static napi_value PostUrl(napi_env env, napi_callback_info info);

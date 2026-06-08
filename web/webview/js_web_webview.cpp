@@ -1293,6 +1293,33 @@ napi_value NapiWebviewController::SetWebDebuggingAccess(napi_env env, napi_callb
     return result;
 }
 
+napi_value NapiWebviewController::GetDefaultUserAgent(napi_env env, napi_callback_info info)
+{
+    // Stub: return a standard Android Chrome user-agent string
+    const char* defaultUA =
+        "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/126.0.6478.122 Mobile Safari/537.36";
+    napi_value result = nullptr;
+    napi_create_string_utf8(env, defaultUA, NAPI_AUTO_LENGTH, &result);
+    return result;
+}
+
+napi_value NapiWebviewController::SetAppCustomUserAgent(napi_env env, napi_callback_info info)
+{
+    // Stub: no-op — accept the UA string but don't store it globally
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_undefined(env, &result));
+    return result;
+}
+
+napi_value NapiWebviewController::SetUserAgentForHosts(napi_env env, napi_callback_info info)
+{
+    // Stub: no-op — accept UA and hosts array but don't apply per-host rules
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_undefined(env, &result));
+    return result;
+}
+
 napi_value NapiWebviewController::BackOrForward(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -1953,6 +1980,9 @@ napi_value NapiWebviewController::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("createWebMessagePorts", NapiWebviewController::CreateWebMessagePorts),
         DECLARE_NAPI_FUNCTION("postMessage", NapiWebviewController::PostMessage),
         DECLARE_NAPI_STATIC_FUNCTION("setWebDebuggingAccess", NapiWebviewController::SetWebDebuggingAccess),
+        DECLARE_NAPI_STATIC_FUNCTION("getDefaultUserAgent", NapiWebviewController::GetDefaultUserAgent),
+        DECLARE_NAPI_STATIC_FUNCTION("setAppCustomUserAgent", NapiWebviewController::SetAppCustomUserAgent),
+        DECLARE_NAPI_STATIC_FUNCTION("setUserAgentForHosts", NapiWebviewController::SetUserAgentForHosts),
         DECLARE_NAPI_FUNCTION("pageDown", NapiWebviewController::PageDown),
         DECLARE_NAPI_FUNCTION("postUrl", NapiWebviewController::PostUrl),
         DECLARE_NAPI_FUNCTION("startDownload", NapiWebviewController::StartDownload),
