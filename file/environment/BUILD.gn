@@ -1,0 +1,10 @@
+import("//build/templates/abc/ohos_abc.gni")
+
+ohos_abc("environment") {
+  sources = [ "environment.js" ]
+  output_name = "environment"
+  install_images = [ "system" ]
+  module_install_dir = "etc/abc/arkui"
+  subsystem_name = "plugins"
+  part_name = "file"
+}

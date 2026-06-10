@@ -1,3 +1,8 @@
 group("all_plugins") {
-  deps = [ "//plugins/bridge:bridge_static_android" ]
+  deps = [
+    "//plugins/bridge:bridge_static_android",
+    "//plugins/file/fileio:fileio",
+    "//plugins/file/environment:environment",
+    "//plugins/settings:settings",
+  ]
 }
