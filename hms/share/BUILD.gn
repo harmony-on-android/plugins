@@ -59,6 +59,8 @@ template("plugin_hms_share_static") {
       "//plugins/libs/napi:napi_${target_os}",
     ]
 
+    libs = [ "log" ]
+
     if (target_os == "ios") {
       deps += [ ":gen_obj_src_hms_share_abc" ]
     } else if (target_os == "android") {

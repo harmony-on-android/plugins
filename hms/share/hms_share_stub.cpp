@@ -14,7 +14,16 @@
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 
+#include <android/log.h>
 #include <string>
+
+#ifdef ANDROID_PLATFORM
+#include "plugins/interfaces/native/plugin_utils.h"
+#endif
+
+#define LOG_TAG "HOA.systemShare"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 extern const char _binary_system_share_mock_abc_start[];
 extern const char _binary_system_share_mock_abc_end[];
@@ -39,7 +48,7 @@ void NAPI_sharekit_GetABCCode(const char **buf, int *buflen)
 
 // =========================================================================
 // showSharePanel(text, title, description) → Promise<void>
-// Bridges to Android Intent.ACTION_SEND
+// Bridges to Android Intent.ACTION_SEND via JNI → Kotlin ShareHelper.showShare()
 // =========================================================================
 static napi_value ShowSharePanel(napi_env env, napi_callback_info info)
 {
@@ -65,10 +74,46 @@ static napi_value ShowSharePanel(napi_env env, napi_callback_info info)
     getString(args[1], title);
     getString(args[2], description);
 
-    // Build a JSON payload to pass to Java via a known JNI method.
-    // The Java side (ShareHelper) picks this up from the singleton.
-    // For now, we log and resolve — the JNI bridge is added next.
-    // TODO: call Java ShareHelper.showSharePanel(text, title, description)
+    LOGI("ShowSharePanel: title=\"%s\" text_len=%zu", title.c_str(), text.length());
+
+#ifdef ANDROID_PLATFORM
+    // Bridge to Kotlin ShareHelper.showShare() via JNI
+    JNIEnv* jniEnv = ARKUI_X_Plugin_GetJniEnv();
+    if (jniEnv) {
+        jclass clazz = jniEnv->FindClass("app/hackeris/hoa/ShareHelper");
+        if (clazz) {
+            jmethodID method = jniEnv->GetStaticMethodID(
+                clazz, "showShare",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+            if (method) {
+                jstring jtext = jniEnv->NewStringUTF(text.c_str());
+                jstring jtitle = jniEnv->NewStringUTF(title.c_str());
+                jstring jdesc = jniEnv->NewStringUTF(description.c_str());
+
+                jniEnv->CallStaticVoidMethod(clazz, method, jtext, jtitle, jdesc);
+
+                if (jniEnv->ExceptionCheck()) {
+                    LOGE("JNI exception in ShareHelper.showShare");
+                    jniEnv->ExceptionDescribe();
+                    jniEnv->ExceptionClear();
+                } else {
+                    LOGI("ShareHelper.showShare() OK");
+                }
+
+                jniEnv->DeleteLocalRef(jtext);
+                jniEnv->DeleteLocalRef(jtitle);
+                jniEnv->DeleteLocalRef(jdesc);
+            } else {
+                LOGE("GetStaticMethodID for showShare failed");
+            }
+            jniEnv->DeleteLocalRef(clazz);
+        } else {
+            LOGE("FindClass ShareHelper failed");
+        }
+    } else {
+        LOGE("ARKUI_X_Plugin_GetJniEnv() returned null");
+    }
+#endif
 
     napi_value promise = nullptr;
     napi_deferred deferred = nullptr;
@@ -86,6 +131,7 @@ static napi_value ShowSharePanel(napi_env env, napi_callback_info info)
 // =========================================================================
 static napi_value InitShareKit(napi_env env, napi_value exports)
 {
+    LOGI("InitShareKit: registering collaboration.systemShare");
     napi_value fnShowSharePanel = nullptr;
     napi_create_function(env, "showSharePanel", NAPI_AUTO_LENGTH,
                          ShowSharePanel, nullptr, &fnShowSharePanel);
@@ -109,6 +155,7 @@ static napi_module_with_js g_shareModule = {
 
 extern "C" __attribute__((constructor)) void RegisterShareKit()
 {
+    LOGI("RegisterShareKit: constructor");
     napi_module_with_js_register(&g_shareModule);
 }
 
