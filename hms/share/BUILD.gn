@@ -64,7 +64,10 @@ template("plugin_hms_share_static") {
     if (target_os == "ios") {
       deps += [ ":gen_obj_src_hms_share_abc" ]
     } else if (target_os == "android") {
-      deps += [ ":hms_share_abc" ]
+      deps += [
+        ":hms_share_abc",
+        "android/java:hms_share_java",
+      ]
     }
 
     subsystem_name = "plugins"

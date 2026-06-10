@@ -80,7 +80,7 @@ static napi_value ShowSharePanel(napi_env env, napi_callback_info info)
     // Bridge to Kotlin ShareHelper.showShare() via JNI
     JNIEnv* jniEnv = ARKUI_X_Plugin_GetJniEnv();
     if (jniEnv) {
-        jclass clazz = jniEnv->FindClass("app/hackeris/hoa/ShareHelper");
+        jclass clazz = jniEnv->FindClass("app/hackeris/hoa/plugin/share/ShareHelper");
         if (clazz) {
             jmethodID method = jniEnv->GetStaticMethodID(
                 clazz, "showShare",
