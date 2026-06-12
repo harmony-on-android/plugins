@@ -474,6 +474,7 @@ static napi_value AbilityAccessCtrlExport(napi_env env, napi_value exports)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("checkAccessTokenSync", JSCheckAccessTokenSync),
         DECLARE_NAPI_FUNCTION("checkAccessToken", JSCheckAccessToken),
+        DECLARE_NAPI_FUNCTION("verifyAccessToken", JSCheckAccessToken),
         DECLARE_NAPI_FUNCTION("requestPermissionsFromUser", JSRequestPermissionsFromUser),
     };
 

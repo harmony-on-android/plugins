@@ -539,11 +539,52 @@ __decorate([Param], HdsSideBar.prototype, "scaleContentEnabled", void 0);
 // =========================================================================
 // Component delegations: HDS components → ArkUI built-ins
 // =========================================================================
-export const HdsNavigation = Navigation;
+// ArkUI-X's Navigation is missing some OHOS API 12+ methods
+// (bindToScrollable, titleBar, bindContentCover).  Wrap in a Proxy
+// so missing static methods return a noop instead of undefined,
+// preventing "@ComponentV2 has error in update func" blank screens.
+var _navNoop = function () { return undefined; };
+var _HdsNavigationProxy = {
+    get: function (target, prop, receiver) {
+        if (prop in target) {
+            return target[prop];
+        }
+        if (typeof prop === 'symbol') {
+            return undefined;
+        }
+        return _navNoop;
+    }
+};
+export const HdsNavigation = new Proxy(Navigation, _HdsNavigationProxy);
 export const HdsNavDestination = NavDestination;
 export const HdsTabs = Tabs;
 export const HdsListItemCard = ListItem;
 export const HdsListItem = ListItem;
+
+// =========================================================================
+// BottomTabBarStyle — ArkUI global class (not HDS-specific, but provided
+// here because ArkUI-X doesn't auto-register all API-12 globals).
+// Used by TabContent.tabBar(BottomTabBarStyle.of(...)).
+// =========================================================================
+class BottomTabBarStyleImpl {
+    constructor(icon, text) {
+        this.type = "BottomTabBarStyle";
+        this.icon = icon;
+        this.text = text;
+    }
+    static of(icon, text) {
+        return new BottomTabBarStyleImpl(icon, text);
+    }
+    labelStyle(value) { this.labelStyle_ = value; return this; }
+    padding(value) { this.padding = value; return this; }
+    layoutMode(value) { this.layoutMode = value; return this; }
+    verticalAlign(value) { this.verticalAlign = value; return this; }
+    symmetricExtensible(value) { this.symmetricExtensible = value; return this; }
+    id(value) { this.id = value; return this; }
+    iconStyle(style) { this.iconStyle_ = style; return this; }
+}
+globalThis.BottomTabBarStyle = BottomTabBarStyleImpl;
+export { BottomTabBarStyleImpl as BottomTabBarStyle };
 
 // =========================================================================
 // PrefixItem / SuffixItem base classes

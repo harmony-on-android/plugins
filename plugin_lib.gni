@@ -33,6 +33,7 @@ common_plugin_libs = [
   "arkui/advanced/exceptionprompt",
   "arkui/advanced/gridobjectsortcomponent",
   "arkui/advanced/chipgroup",
+  "arkui/component",
   "arkui/mock",
   "arkui/modifier",
   "bluetooth/access",

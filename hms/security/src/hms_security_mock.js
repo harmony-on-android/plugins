@@ -84,11 +84,67 @@ function checkSysIntegrityOnLocal() {
 }
 
 // =========================================================================
+// core.appgalleryservice.privacyManager namespace
+// =========================================================================
+function getAppPrivacyMgmtInfo(callback) {
+    var mockInfo = {
+        // AppPrivacyMgmtInfo fields
+        privacyInfo: [
+            {
+                type: "privacy_statement",
+                versionCode: 1,
+                url: "about:blank"
+            }
+        ],
+        isPrivacyAllowed: true,
+        supportFeatures: []
+    };
+    if (typeof callback === 'function') {
+        callback(undefined, mockInfo);
+        return;
+    }
+    return mockInfo;
+}
+
+// =========================================================================
+// userIAM.userAuth namespace — user identity & access management
+// =========================================================================
+function getAuthenticator() {
+    return {};
+}
+function getAvailableStatus(authType, authTrustLevel) {
+    return 0; // 0 = available
+}
+function auth(challenge, authType, authTrustLevel, callback) {
+    if (typeof callback === 'function') {
+        var result = { result: 0, token: 'mock-auth-token' }; // 0 = success
+        callback(undefined, result);
+    }
+}
+var UserAuthType = {
+    PIN: 1,
+    FACE: 2,
+    FINGERPRINT: 4,
+};
+var UserAuthResult = {
+    SUCCESS: 0,
+    FAIL: -1,
+    CANCEL: -2,
+};
+function checkAccessToken(tokenId, permission) {
+    return 0; // 0 = GRANTED in ATM
+}
+function verifyAccessToken(tokenId, permission) {
+    return Promise.resolve(0); // GRANTED
+}
+
+// =========================================================================
 // Default export (required by GetExportObjectFromBuffer("default"))
 // Flattened: all methods from all namespaces are direct properties.
 // Method names are unique across namespaces (no collisions).
 // =========================================================================
-export default {
+// Base exports with all known stub functions
+var _exports = {
     getDeviceToken,
     getAAID,
     deleteAAID,
@@ -97,4 +153,34 @@ export default {
     checkSysIntegrity,
     checkSysIntegrityEnhanced,
     checkSysIntegrityOnLocal,
+    getAppPrivacyMgmtInfo,
+    // userIAM.userAuth
+    getAuthenticator,
+    getAvailableStatus,
+    auth,
+    UserAuthType,
+    UserAuthResult,
+    checkAccessToken,
+    verifyAccessToken,
 };
+
+// Wrap in a Proxy so any unknown property returns a no-op function.
+// This prevents "undefined is not callable" when HAP code calls
+// missing APIs — instead of throwing, the call silently succeeds.
+function _noop() { return {}; }
+_noop.isNoop = true;
+
+export default new Proxy(_exports, {
+    get: function(target, prop, receiver) {
+        if (prop in target) {
+            return target[prop];
+        }
+        if (typeof prop === 'symbol') {
+            return undefined;
+        }
+        // Return a noop for any unknown property — prevents
+        // "Cannot read property X of undefined" and
+        // "undefined is not callable" errors.
+        return _noop;
+    }
+});

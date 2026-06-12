@@ -1,0 +1,10 @@
+import("//build/templates/abc/ohos_abc.gni")
+
+ohos_abc("formInfo") {
+  sources = [ "formInfo.js" ]
+  output_name = "forminfo"
+  install_images = [ "system" ]
+  module_install_dir = "etc/abc/arkui"
+  subsystem_name = "plugins"
+  part_name = "form"
+}
