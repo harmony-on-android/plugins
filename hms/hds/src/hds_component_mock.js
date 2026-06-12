@@ -580,11 +580,25 @@ function _hdsUnwrapTitleBar(config) {
 if (Navigation.prototype) {
     Navigation.prototype._hoaTitleBar = function (config) {
         _hdsUnwrapTitleBar(config);
+        // Set title text
         if (config && config.content && config.content.title &&
             config.content.title.mainTitle !== undefined) {
             this.title(config.content.title.mainTitle);
         } else if (config && config.mainTitle !== undefined) {
             this.title(config.mainTitle);
+        }
+        // HOA: Attempt to show search bar via global event hub.
+        // The HAP toggles search visibility via
+        //   appCtx.eventHub.emit('toggleTokenSearch')
+        // which is registered in TokenListPage.aboutToAppear().
+        // We emit the event here so the search bar becomes visible
+        // even without the title bar menu button (which ArkUI-X
+        // Navigation cannot render yet).
+        if (typeof globalThis !== 'undefined' && globalThis.__hoaAppCtx) {
+            var ctx = globalThis.__hoaAppCtx;
+            if (ctx.eventHub && ctx.eventHub.emit) {
+                ctx.eventHub.emit('toggleTokenSearch');
+            }
         }
     };
 }
