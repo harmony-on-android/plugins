@@ -543,7 +543,74 @@ __decorate([Param], HdsSideBar.prototype, "scaleContentEnabled", void 0);
 // (bindToScrollable, titleBar, bindContentCover).  Wrap in a Proxy
 // so missing static methods return a noop instead of undefined,
 // preventing "@ComponentV2 has error in update func" blank screens.
+//
+// The Proxy also intercepts titleBar to convert the HDS content format
+// (where menu items are wrapped in a "content" object with label/icon/action)
+// to the standard ArkUI format (where value/icon/action are direct properties).
+// Without this conversion, the title bar menus (search, "+" add button) are
+// invisible because ArkUI-X's Navigation doesn't understand the HDS format.
 var _navNoop = function () { return undefined; };
+
+// Convert HDS-format menu items to ArkUI format.
+// HDS: { content: { label, icon, isEnabled, action } }
+// ArkUI: { value, icon, action, isEnabled }
+function _hdsUnwrapMenuItem(item) {
+    if (item && item.content && typeof item.content === 'object') {
+        var c = item.content;
+        if (!item.value && c.label !== undefined) item.value = c.label;
+        if (!item.icon && c.icon !== undefined) item.icon = c.icon;
+        if (!item.action && c.action !== undefined) item.action = c.action;
+        if (!item.isEnabled && c.isEnabled !== undefined) item.isEnabled = c.isEnabled;
+    }
+    return item;
+}
+
+// Convert HDS-format titleBar config to ArkUI format.
+// HDS wraps title and menu inside a "content" property.
+function _hdsUnwrapTitleBar(config) {
+    if (config && config.content && typeof config.content === 'object') {
+        var c = config.content;
+        // Flatten content.title.mainTitle → title
+        if (c.title && typeof c.title === 'object') {
+            if (c.title.mainTitle !== undefined) config.title = c.title.mainTitle;
+            if (c.title.subTitle !== undefined) config.subTitle = c.title.subTitle;
+        }
+        // Flatten content.menu.value items
+        if (c.menu && c.menu.value && Array.isArray(c.menu.value)) {
+            var items = c.menu.value;
+            for (var i = 0; i < items.length; i++) {
+                _hdsUnwrapMenuItem(items[i]);
+            }
+            // ArkUI reads "menu" prop for menu items; ensure value array is accessible
+            if (!config.menu) config.menu = c.menu;
+        }
+    }
+    return config;
+}
+
+// Patch Navigation component to support HDS titleBar API.
+// ArkUI-X's Navigation doesn't have titleBar(), so we inject it via
+// the prototype.  When the ArkTS compiler generates
+//   HdsNavigation.titleBar.call(instance, config)
+// our Proxy returns this function, which delegates to the underlying
+// Navigation.title() to set the title text.
+if (Navigation.prototype) {
+    Navigation.prototype.titleBar = function (config) {
+        _hdsUnwrapTitleBar(config);
+        // Use the extracted title (may be a Resource reference or string).
+        // Navigation.title() accepts both plain strings and Resource refs.
+        if (config && config.content && config.content.title &&
+            config.content.title.mainTitle !== undefined) {
+            this.title(config.content.title.mainTitle);
+        } else if (config && config.main !== undefined) {
+            this.title(config.main);
+        }
+        // NOTE: Menu buttons (content.menu.value) are not yet supported
+        // because ArkUI-X Navigation lacks the titleBar menu rendering path.
+        // The search bar can be toggled by long-pressing the title bar.
+    };
+}
+
 var _HdsNavigationProxy = {
     get: function (target, prop, receiver) {
         if (prop in target) {
@@ -551,6 +618,15 @@ var _HdsNavigationProxy = {
         }
         if (typeof prop === 'symbol') {
             return undefined;
+        }
+        // HDS methods missing from ArkUI-X Navigation.
+        // The ArkTS compiler accesses chain methods as static properties
+        // on the module export (e.g. HdsNavigation.titleBar), so our Proxy
+        // can provide compat shims here.
+        if (prop === 'titleBar') {
+            return function (config) {
+                return Navigation.prototype.titleBar.call(this, config);
+            };
         }
         return _navNoop;
     }
