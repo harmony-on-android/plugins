@@ -49,7 +49,14 @@ static constexpr int32_t ASYNC_CALL_BACK_VALUES_NUM = 2;
 static constexpr int32_t MAX_LENGTH = 256;
 static constexpr int32_t RET_SUCCESS = 0;
 
+// HOA: On Android there is no real ATM service.  The HAP obtains tokenId from
+// bundleManager.getBundleInfoForSelf() which returns 0 when unsupported, so we
+// must accept tokenId == 0 and proceed to the (mocked) permission check.
+#if defined(ANDROID_PLATFORM)
+static inline bool IsTokenIDValid(uint32_t id) { return true; }
+#else
 static inline bool IsTokenIDValid(uint32_t id) { return id != 0; }
+#endif
 
 static bool IsPermissionNameValid(const std::string& permissionName)
 {

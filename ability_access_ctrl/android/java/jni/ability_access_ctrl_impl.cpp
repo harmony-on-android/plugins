@@ -76,6 +76,10 @@ static void InitPermissionMap()
     // Without this entry, OhPermissionToJava() returns false, the permission
     // is treated as unknown, and requestPermissionsFromUser() rejects with an error.
     g_permissionMap["ohos.permission.INTERNET"] = "android.permission.INTERNET";
+    // HOA: Map OHOS-only permissions to Android INTERNET (always granted).
+    // These have no Android equivalent but are needed by HAPs at runtime.
+    g_permissionMap["ohos.permission.DISTRIBUTED_DATASYNC"] = "android.permission.INTERNET";
+    g_permissionMap["ohos.permission.STORE_PERSISTENT_DATA"] = "android.permission.INTERNET";
 
     // add bluetooth permission
     std::vector<std::string> bluetoothPermission;
