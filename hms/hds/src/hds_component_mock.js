@@ -587,18 +587,13 @@ if (Navigation.prototype) {
         } else if (config && config.mainTitle !== undefined) {
             this.title(config.mainTitle);
         }
-        // HOA: Attempt to show search bar via global event hub.
-        // The HAP toggles search visibility via
-        //   appCtx.eventHub.emit('toggleTokenSearch')
-        // which is registered in TokenListPage.aboutToAppear().
-        // We emit the event here so the search bar becomes visible
-        // even without the title bar menu button (which ArkUI-X
-        // Navigation cannot render yet).
-        if (typeof globalThis !== 'undefined' && globalThis.__hoaAppCtx) {
-            var ctx = globalThis.__hoaAppCtx;
-            if (ctx.eventHub && ctx.eventHub.emit) {
-                ctx.eventHub.emit('toggleTokenSearch');
-            }
+        // HOA: Set menu items from HDS titleBar content.menu.
+        // HDS wraps items as { content: { label, icon, isEnabled, action } }.
+        // _hdsUnwrapTitleBar converts to ArkUI { value, icon, isEnabled, action }
+        // and stores the array in config.menuItems.
+        // Navigation.menus() renders them as direct icon buttons in the title bar.
+        if (config && config.menuItems && config.menuItems.length > 0) {
+            Navigation.menus(config.menuItems);
         }
     };
 }
