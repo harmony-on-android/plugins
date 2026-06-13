@@ -991,6 +991,33 @@ export function HdsNavDestinationAttribute() { }
 export function HdsTabsInstance() { }
 export function HdsListItemCardInstance() { }
 export function bleedIconStyle(builder) { }
+// hdsEffect namespace — visual effects (pressShadow, pointLight, shaderEffect)
+// SDK: @hms.hds.hdsBaseComponent.d.ets lines 23–685
+class _ShaderEffectController {
+    constructor() { }
+    play() { }
+    pause() { }
+    resume() { }
+    reverse() { }
+    stop() { }
+    setEffectParams(params) { }
+}
+class _HdsEffectBuilder {
+    constructor() { }
+    pressShadow(type) { return this; }
+    pointLight(value) { return this; }
+    shaderEffect(params) { return this; }
+    buildEffect() { return {}; }
+}
+export const hdsEffect = {
+    PressShadowType: { NONE: 0, BLEND_GRADIENT: 1, BLEND_WHITE: 2 },
+    PointLightSourceType: { NONE: 0, SOFT: 1, BRIGHT: 2 },
+    PointLightIlluminatedType: { NONE: 0, BORDER: 1, CONTENT: 2, BORDER_CONTENT: 3, DEFAULT_FEATHERING_BORDER: 20 },
+    EffectType: { DUAL_EDGE_FLOW_LIGHT: 0, UV_BACKGROUND_FLOW_LIGHT: 1 },
+    FrameRateType: { FRAME_RATE_15: 15, FRAME_RATE_30: 30, FRAME_RATE_60: 60 },
+    ShaderEffectController: _ShaderEffectController,
+    HdsEffectBuilder: _HdsEffectBuilder,
+};
 
 // =========================================================================
 // Default export (required by GetExportObjectFromBuffer("default"))
@@ -1074,4 +1101,5 @@ export default {
     HdsTabsInstance,
     HdsListItemCardInstance,
     bleedIconStyle,
+    hdsEffect,
 };
