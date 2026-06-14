@@ -13,6 +13,16 @@
 
 import("//build/ohos.gni")
 
+# Pure-ABC plugins (ohos_abc targets) that need to be built as deps of
+# declarative_js_engine.  Each entry is a GN label relative to //plugins/.
+# Add new pure-ABC plugins here — no need to touch ace_engine BUILD.gn.
+common_abc_plugins = [
+  "//plugins/settings:settings",
+  "//plugins/file/fileio:fileio",
+  "//plugins/file/environment:environment",
+  "//plugins/form/formInfo:formInfo",
+]
+
 common_plugin_libs = [
   "ability_access_ctrl",
   "accessibility",
