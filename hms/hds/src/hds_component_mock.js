@@ -164,8 +164,8 @@ export class HdsActionBar extends ViewV2 {
     }
 
     _renderButton(btn, isPrimary) {
-        const btnSize = btn?.width ?? 40;
-        const iconSize = this._btnIconSize(btn);
+        const btnSize = btn?.width ?? (isPrimary ? 64 : 56);
+        const iconSize = btn?.iconSize ?? (isPrimary ? 32 : 28);
         const enabled = btn?.enabled !== false;
         // Pre-compute component type from baseIcon (doesn't change between renders)
         const baseIsSymbol = btn?.baseIcon && typeof btn?.baseIcon === 'object' && btn.baseIcon.type === 40000;
@@ -221,29 +221,42 @@ export class HdsActionBar extends ViewV2 {
         const bgBlur = this.actionBarStyle?.backgroundBlurStyle;
         const margin = this.actionBarStyle?.margin;
 
-        // Container — Row (horizontal) or Column (vertical)
+        // Container — Row (horizontal) or Stack→Column (vertical, floating)
+        // Horizontal: full-width Row, buttons clustered in centre.
+        //   Blank spacers removed (they stretched buttons to both edges).
+        // Vertical: Stack overlay so the bar floats above content at the
+        //   right edge (matching OHOS vertical HdsActionBar behaviour).
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             if (isHorizontal) {
                 Row.create();
                 Row.width("100%");
                 Row.height(this._barHeight());
                 Row.alignItems(VerticalAlign.Center);
+                Row.justifyContent(FlexAlign.Center);
                 Row.padding({ left: this._startPad(), right: this._endPad() });
                 if (innerSpace) { Row.space(innerSpace); }
                 if (bgColor) { Row.backgroundColor(bgColor); }
                 if (bgBlur != null) { Row.backgroundBlurStyle(bgBlur); }
                 if (margin) { Row.margin(margin); }
             } else {
+                Stack.create();
+                Stack.alignContent(Alignment.TopEnd);
+            }
+        }, isHorizontal ? Row : Stack);
+
+        // Vertical inner Column (child of Stack)
+        if (!isHorizontal) {
+            this.observeComponentCreation2((elmtId, isInitialRender) => {
                 Column.create();
-                Column.width("100%");
                 Column.alignItems(HorizontalAlign.Center);
                 Column.padding({ top: this._startPad(), bottom: this._endPad() });
                 if (innerSpace) { Column.space(innerSpace); }
                 if (bgColor) { Column.backgroundColor(bgColor); }
                 if (bgBlur != null) { Column.backgroundBlurStyle(bgBlur); }
                 if (margin) { Column.margin(margin); }
-            }
-        }, isHorizontal ? Row : Column);
+                else { Column.margin({ right: 16 }); }
+            }, Column);
+        }
 
         // Start buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
@@ -260,14 +273,6 @@ export class HdsActionBar extends ViewV2 {
         }, If);
         If.pop();
 
-        // Spacer before primary button (horizontal only)
-        if (isHorizontal) {
-            this.observeComponentCreation2((elmtId, isInitialRender) => {
-                Blank.create();
-            }, Blank);
-            Blank.pop();
-        }
-
         // Primary button
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
@@ -280,14 +285,6 @@ export class HdsActionBar extends ViewV2 {
             }
         }, If);
         If.pop();
-
-        // Spacer before end buttons (horizontal only)
-        if (isHorizontal) {
-            this.observeComponentCreation2((elmtId, isInitialRender) => {
-                Blank.create();
-            }, Blank);
-            Blank.pop();
-        }
 
         // End buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
@@ -304,11 +301,11 @@ export class HdsActionBar extends ViewV2 {
         }, If);
         If.pop();
 
-        if (isHorizontal) {
-            Row.pop();
-        } else {
-            Column.pop();
-        }
+        // Pop inner Column (vertical) or nothing (horizontal)
+        if (!isHorizontal) { Column.pop(); }
+
+        // Pop outer container
+        if (isHorizontal) { Row.pop(); } else { Stack.pop(); }
     }
 
     updateStateVars(params) {
