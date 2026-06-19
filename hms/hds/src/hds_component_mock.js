@@ -164,8 +164,8 @@ export class HdsActionBar extends ViewV2 {
     }
 
     _renderButton(btn, isPrimary) {
-        const btnSize = btn?.width ?? (isPrimary ? 64 : 56);
-        const iconSize = btn?.iconSize ?? (isPrimary ? 32 : 28);
+        const btnSize = btn?.width ?? (isPrimary ? 56 : 48);
+        const iconSize = btn?.iconSize ?? (isPrimary ? 28 : 24);
         const enabled = btn?.enabled !== false;
         // Pre-compute component type from baseIcon (doesn't change between renders)
         const baseIsSymbol = btn?.baseIcon && typeof btn?.baseIcon === 'object' && btn.baseIcon.type === 40000;
@@ -177,8 +177,10 @@ export class HdsActionBar extends ViewV2 {
             Row.borderRadius(btnSize / 2);
             Row.justifyContent(FlexAlign.Center);
             Row.alignItems(VerticalAlign.Center);
+            Row.margin({ left: 4, right: 4, top: 4, bottom: 4 });
             if (!enabled) { Row.opacity(0.4); }
             if (btn?.backgroundColor) { Row.backgroundColor(btn.backgroundColor); }
+            else { Row.backgroundColor("#F5F5F5"); }
             if (btn?.shadowStyle != null) { Row.shadow(btn.shadowStyle); }
             Row.onClick(() => {
                 if (enabled && btn?.onClick) { btn.onClick(); }
@@ -221,11 +223,7 @@ export class HdsActionBar extends ViewV2 {
         const bgBlur = this.actionBarStyle?.backgroundBlurStyle;
         const margin = this.actionBarStyle?.margin;
 
-        // Container — Row (horizontal) or Stack→Column (vertical, floating)
-        // Horizontal: full-width Row, buttons clustered in centre.
-        //   Blank spacers removed (they stretched buttons to both edges).
-        // Vertical: Stack overlay so the bar floats above content at the
-        //   right edge (matching OHOS vertical HdsActionBar behaviour).
+        // Container — Row (horizontal) or Stack (vertical)
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             if (isHorizontal) {
                 Row.create();
@@ -234,9 +232,6 @@ export class HdsActionBar extends ViewV2 {
                 Row.alignItems(VerticalAlign.Center);
                 Row.justifyContent(FlexAlign.Center);
                 Row.padding({ left: this._startPad(), right: this._endPad() });
-                if (innerSpace) { Row.space(innerSpace); }
-                if (bgColor) { Row.backgroundColor(bgColor); }
-                if (bgBlur != null) { Row.backgroundBlurStyle(bgBlur); }
                 if (margin) { Row.margin(margin); }
             } else {
                 Stack.create();
@@ -244,19 +239,26 @@ export class HdsActionBar extends ViewV2 {
             }
         }, isHorizontal ? Row : Stack);
 
-        // Vertical inner Column (child of Stack)
-        if (!isHorizontal) {
-            this.observeComponentCreation2((elmtId, isInitialRender) => {
+        // Area wrapper: groups buttons with bg/blur/borderRadius (OHOS "area" node)
+        this.observeComponentCreation2((elmtId, isInitialRender) => {
+            if (isHorizontal) {
+                Row.create();
+                Row.alignItems(VerticalAlign.Center);
+                Row.borderRadius(this._barHeight() / 2);
+                if (innerSpace) { Row.space(innerSpace); }
+            } else {
                 Column.create();
                 Column.alignItems(HorizontalAlign.Center);
-                Column.padding({ top: this._startPad(), bottom: this._endPad() });
+                Column.constraintSize({ maxWidth: 72 });
+                Column.borderRadius(28);
                 if (innerSpace) { Column.space(innerSpace); }
-                if (bgColor) { Column.backgroundColor(bgColor); }
-                if (bgBlur != null) { Column.backgroundBlurStyle(bgBlur); }
-                if (margin) { Column.margin(margin); }
-                else { Column.margin({ right: 16 }); }
-            }, Column);
-        }
+            }
+            if (bgColor) { (isHorizontal ? Row : Column).backgroundColor(bgColor); }
+            else { (isHorizontal ? Row : Column).backgroundColor(Color.White); }
+            if (bgBlur != null) { (isHorizontal ? Row : Column).backgroundBlurStyle(bgBlur); }
+            if (!isHorizontal && !margin) { Column.margin({ right: 16 }); }
+            else if (margin) { (isHorizontal ? Row : Column).margin(margin); }
+        }, isHorizontal ? Row : Column);
 
         // Start buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
@@ -273,6 +275,15 @@ export class HdsActionBar extends ViewV2 {
         }, If);
         If.pop();
 
+        // Spacer between start and primary
+        if (this.startButtons?.length > 0 && this.primaryButton) {
+            this.observeComponentCreation2((elmtId, isInitialRender) => {
+                Blank.create();
+                Blank.width(12);
+            }, Blank);
+            Blank.pop();
+        }
+
         // Primary button
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
@@ -285,6 +296,15 @@ export class HdsActionBar extends ViewV2 {
             }
         }, If);
         If.pop();
+
+        // Spacer between primary and end
+        if (this.primaryButton && this.endButtons?.length > 0) {
+            this.observeComponentCreation2((elmtId, isInitialRender) => {
+                Blank.create();
+                Blank.width(12);
+            }, Blank);
+            Blank.pop();
+        }
 
         // End buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
@@ -301,8 +321,8 @@ export class HdsActionBar extends ViewV2 {
         }, If);
         If.pop();
 
-        // Pop inner Column (vertical) or nothing (horizontal)
-        if (!isHorizontal) { Column.pop(); }
+        // Pop area wrapper
+        if (isHorizontal) { Row.pop(); } else { Column.pop(); }
 
         // Pop outer container
         if (isHorizontal) { Row.pop(); } else { Stack.pop(); }
