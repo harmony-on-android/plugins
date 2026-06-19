@@ -177,7 +177,9 @@ export class HdsActionBar extends ViewV2 {
             Row.borderRadius(btnSize / 2);
             Row.justifyContent(FlexAlign.Center);
             Row.alignItems(VerticalAlign.Center);
-            Row.margin({ left: 4, right: 4, top: 4, bottom: 4 });
+            // Primary button gets zero margin when collapsed so area hugs it
+            const m = (isPrimary && this.isExpand === false) ? 0 : 4;
+            Row.margin({ left: m, right: m, top: m, bottom: m });
             if (!enabled) { Row.opacity(0.4); }
             if (btn?.backgroundColor) { Row.backgroundColor(btn.backgroundColor); }
             else { Row.backgroundColor("#F5F5F5"); }
@@ -260,10 +262,16 @@ export class HdsActionBar extends ViewV2 {
             else if (margin) { (isHorizontal ? Row : Column).margin(margin); }
         }, isHorizontal ? Row : Column);
 
+        // When isExpand=false AND primaryButton exists, the bar is "collapsed":
+        // only the primary button is visible.  Otherwise all buttons show.
+        // The check uses this.isExpand (NOT a local variable) so the V2
+        // reactivity system re-evaluates the If branches on state changes.
+
         // Start buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
-            if (this.startButtons && this.startButtons.length > 0) {
+            if (this.startButtons && this.startButtons.length > 0 &&
+                !(this.isExpand === false && this.primaryButton)) {
                 this.ifElseBranchUpdateFunction(0, () => {
                     for (let i = 0; i < this.startButtons.length; i++) {
                         this._renderButton(this.startButtons[i], false);
@@ -275,14 +283,17 @@ export class HdsActionBar extends ViewV2 {
         }, If);
         If.pop();
 
-        // Spacer between start and primary
-        if (this.startButtons?.length > 0 && this.primaryButton) {
-            this.observeComponentCreation2((elmtId, isInitialRender) => {
-                Blank.create();
+        // Spacer between start and primary (width 0 when collapsed)
+        this.observeComponentCreation2((elmtId, isInitialRender) => {
+            Blank.create();
+            if (this.startButtons?.length > 0 && this.primaryButton &&
+                !(this.isExpand === false && this.primaryButton)) {
                 Blank.width(12);
-            }, Blank);
-            Blank.pop();
-        }
+            } else {
+                Blank.width(0);
+            }
+        }, Blank);
+        Blank.pop();
 
         // Primary button
         this.observeComponentCreation2((elmtId, isInitialRender) => {
@@ -297,19 +308,23 @@ export class HdsActionBar extends ViewV2 {
         }, If);
         If.pop();
 
-        // Spacer between primary and end
-        if (this.primaryButton && this.endButtons?.length > 0) {
-            this.observeComponentCreation2((elmtId, isInitialRender) => {
-                Blank.create();
+        // Spacer between primary and end (width 0 when collapsed)
+        this.observeComponentCreation2((elmtId, isInitialRender) => {
+            Blank.create();
+            if (this.primaryButton && this.endButtons?.length > 0 &&
+                !(this.isExpand === false && this.primaryButton)) {
                 Blank.width(12);
-            }, Blank);
-            Blank.pop();
-        }
+            } else {
+                Blank.width(0);
+            }
+        }, Blank);
+        Blank.pop();
 
         // End buttons
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
-            if (this.endButtons && this.endButtons.length > 0) {
+            if (this.endButtons && this.endButtons.length > 0 &&
+                !(this.isExpand === false && this.primaryButton)) {
                 this.ifElseBranchUpdateFunction(0, () => {
                     for (let i = 0; i < this.endButtons.length; i++) {
                         this._renderButton(this.endButtons[i], false);
