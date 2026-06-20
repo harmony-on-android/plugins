@@ -609,21 +609,18 @@ function _hdsUnwrapTitleBar(config) {
     return config;
 }
 
+// titleBar shim — attach .titleBar() to Navigation.prototype.
+// Converts HDS titleBar config format (content.title, content.menu[])
+// to ArkUI .title() and Navigation.menus().
 if (Navigation.prototype) {
-    Navigation.prototype._hoaTitleBar = function (config) {
+    Navigation.prototype.titleBar = function (config) {
         _hdsUnwrapTitleBar(config);
-        // Set title text
         if (config && config.content && config.content.title &&
             config.content.title.mainTitle !== undefined) {
             this.title(config.content.title.mainTitle);
         } else if (config && config.mainTitle !== undefined) {
             this.title(config.mainTitle);
         }
-        // HOA: Set menu items from HDS titleBar content.menu.
-        // HDS wraps items as { content: { label, icon, isEnabled, action } }.
-        // _hdsUnwrapTitleBar converts to ArkUI { value, icon, isEnabled, action }
-        // and stores the array in config.menuItems.
-        // Navigation.menus() renders them as direct icon buttons in the title bar.
         if (config && config.menuItems && config.menuItems.length > 0) {
             Navigation.menus(config.menuItems);
         }
@@ -636,13 +633,29 @@ var _HdsNavigationProxy = {
         if (typeof prop === 'symbol') return undefined;
         if (prop === 'titleBar') {
             return function (config) {
-                return Navigation.prototype._hoaTitleBar.call(this, config);
+                return Navigation.prototype.titleBar.call(this, config);
             };
         }
         return _navNoop;
     }
 };
 export const HdsNavigation = new Proxy(Navigation, _HdsNavigationProxy);
+// HdsNavDestination = NavDestination + prototype.titleBar shim.
+// Known limitation: NavDestination only renders when a direct child of
+// Navigation.  Inside a Column (BaseTitle/DrawerTitle pattern) it is
+// invisible in ArkUI-X — this is a framework-level constraint.
+if (NavDestination.prototype) {
+    NavDestination.prototype.titleBar = function (config) {
+        _hdsUnwrapTitleBar(config);
+        if (config && config.content && config.content.title &&
+            config.content.title.mainTitle !== undefined) {
+            this.title(config.content.title.mainTitle);
+        } else if (config && config.mainTitle !== undefined) {
+            this.title(config.mainTitle);
+        }
+        return this;
+    };
+}
 export const HdsNavDestination = NavDestination;
 export const HdsTabs = Tabs;
 export const HdsListItemCard = ListItem;
