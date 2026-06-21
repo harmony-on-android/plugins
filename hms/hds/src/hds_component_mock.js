@@ -882,7 +882,19 @@ export class HdsSnackBar {
     constructor(uiContext) {
         this.uiContext = uiContext;
     }
-    show(icon, message, operation, style) { }
+    show(icon, message, operation, style) {
+        try {
+            var promptAction = this.uiContext.getPromptAction();
+            if (!promptAction) return;
+            var msgText = (message && message.title) ? message.title : '';
+            var duration = (style && style.duration !== undefined) ? style.duration : 2000;
+            // Negative duration = persistent; use a long duration as fallback
+            if (duration < 0) duration = 10000;
+            promptAction.showToast({ message: msgText, duration: duration });
+        } catch(e) {
+            console.log('HdsSnackBar.show failed: ' + e);
+        }
+    }
     dismiss() { }
 }
 export const SnackBarOperationType = {
